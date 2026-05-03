@@ -1,0 +1,12 @@
+Contexto del Proyecto: NoteFlow (App Móvil)
+Stack Tecnológico: React Native, Expo SDK, TypeScript, Expo Router.
+UI: Gluestack UI / React Native Paper (por definir).
+Estado Global: Zustand con persistencia (AsyncStorage).
+Listas: Shopify FlashList.
+Validación: Zod.
+
+Reglas:
+- No usar etiquetas HTML (div, span, h1). Usar componentes de React Native.
+- Priorizar componentes funcionales y Hooks.
+- Mantener tipado estricto con TypeScript.
+- Seguir la estructura de carpetas: app/, components/, store/, types/.
