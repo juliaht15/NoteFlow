@@ -1,47 +1,44 @@
-import { View, StyleSheet } from 'react-native';
-import { FlashList } from "@shopify/flash-list";
-import { Text, Checkbox, Card, List as PaperList } from 'react-native-paper';
+import React from 'react';
+import { View, FlatList, StyleSheet } from 'react-native';
+import { Checkbox, Card, Text, Avatar } from 'react-native-paper';
 import { useNotesStore } from '../../store/notesStore';
-import { ChecklistNote } from '../../types';
+import { Colors } from '../../constants/theme';
 
 export default function ChecklistsScreen() {
-  const { notes, toggleChecklistItem } = useNotesStore();
-  const checklists = notes.filter(n => n.type === 'checklist') as ChecklistNote[];
-
-  // TRUCO PARA EVITAR ERROR TS(2322)
-  const List = FlashList as any;
+  const { notes } = useNotesStore();
+  
+  // Filtramos solo las que son categoría 'lista'
+  const lists = notes.filter(n => n.category === 'lista');
 
   return (
     <View style={styles.container}>
-      <List
-        data={checklists}
-        estimatedItemSize={150}
-        keyExtractor={(item: ChecklistNote) => item.id}
-        renderItem={({ item }: { item: ChecklistNote }) => (
+      <FlatList
+        data={lists}
+        keyExtractor={(item) => item.id}
+        ListEmptyComponent={
+          <View style={styles.empty}>
+            <Text style={{ color: Colors.placeholder }}>No hay listas de tareas aún.</Text>
+          </View>
+        }
+        renderItem={({ item }) => (
           <Card style={styles.card}>
-            <Card.Title title={item.title} titleVariant="titleMedium" />
+            <Card.Title 
+              title={item.title} 
+              titleStyle={styles.cardTitle}
+              left={(props) => <Avatar.Icon {...props} icon="format-list-checks" color={Colors.primary} style={{backgroundColor: Colors.secondary}} />}
+            />
             <Card.Content>
-              {item.items.map((task) => (
-                <PaperList.Item
-                  key={task.id}
-                  title={task.text}
-                  titleStyle={{ 
-                    textDecorationLine: task.isCompleted ? 'line-through' : 'none',
-                    opacity: task.isCompleted ? 0.5 : 1
-                  }}
-                  left={() => (
-                    <Checkbox
-                      status={task.isCompleted ? 'checked' : 'unchecked'}
-                      onPress={() => toggleChecklistItem(item.id, task.id)}
-                    />
-                  )}
-                />
+              {item.content.split('\n').map((line: string, index: number) => (
+                <View key={index} style={styles.checkItem}>
+                  <Checkbox.Android 
+                    status="unchecked" 
+                    color={Colors.primary} 
+                  />
+                  <Text style={styles.lineText}>{line}</Text>
+                </View>
               ))}
             </Card.Content>
           </Card>
-        )}
-        ListEmptyComponent={() => (
-          <Text style={styles.empty}>No hay listas de tareas pendientes.</Text>
         )}
       />
     </View>
@@ -49,7 +46,10 @@ export default function ChecklistsScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f5f5f5' },
-  card: { marginHorizontal: 10, marginTop: 10, elevation: 2 },
-  empty: { textAlign: 'center', marginTop: 50, opacity: 0.5 }
+  container: { flex: 1, backgroundColor: Colors.background, padding: 16 },
+  card: { marginBottom: 16, borderRadius: 16, backgroundColor: Colors.surface, elevation: 2 },
+  cardTitle: { fontWeight: 'bold' },
+  checkItem: { flexDirection: 'row', alignItems: 'center', marginBottom: 5 },
+  lineText: { fontSize: 16, color: Colors.text, marginLeft: 8 },
+  empty: { alignItems: 'center', marginTop: 50 }
 });

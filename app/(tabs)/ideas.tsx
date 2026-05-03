@@ -1,32 +1,32 @@
 import React from 'react';
-import { View, StyleSheet } from 'react-native';
-import { FlashList } from "@shopify/flash-list";
-import { Card, Chip, Text } from 'react-native-paper';
+import { View, FlatList, StyleSheet } from 'react-native';
+import { Text, Card, Avatar } from 'react-native-paper';
 import { useNotesStore } from '../../store/notesStore';
-import { IdeaNote } from '../../types';
+import { Colors } from '../../constants/theme';
 
 export default function IdeasScreen() {
-  const notes = useNotesStore((state) => state.notes);
-  const ideas = notes.filter(n => n.type === 'idea') as IdeaNote[];
-
-  // Creamos una referencia al componente con tipo 'any' para evitar el error ts(2322)
-  const List = FlashList as any;
+  const { notes } = useNotesStore();
+  const ideas = notes.filter(n => n.category === 'idea');
 
   return (
     <View style={styles.container}>
-      <List
+      <FlatList
         data={ideas}
-        estimatedItemSize={100}
-        keyExtractor={(item: IdeaNote) => item.id}
-        renderItem={({ item }: { item: IdeaNote }) => (
-          <Card style={[styles.card, { backgroundColor: item.color || '#fff9c4' }]}>
+        keyExtractor={(item) => item.id}
+        ListEmptyComponent={
+          <View style={styles.empty}>
+            <Text style={{ color: Colors.placeholder }}>No tienes ideas guardadas.</Text>
+          </View>
+        }
+        renderItem={({ item }) => (
+          <Card style={styles.card}>
+            <Card.Title
+              title={item.title}
+              titleStyle={styles.cardTitle}
+              left={(props) => <Avatar.Icon {...props} icon="lightbulb-on" color={Colors.primary} style={{ backgroundColor: Colors.secondary }} />}
+            />
             <Card.Content>
-              <Text variant="titleLarge">{item.title}</Text>
-              <View style={styles.chipContainer}>
-                {item.tags?.map((tag, idx) => (
-                  <Chip key={idx} style={styles.chip}>{tag}</Chip>
-                ))}
-              </View>
+              <Text style={styles.content}>{item.content}</Text>
             </Card.Content>
           </Card>
         )}
@@ -36,8 +36,9 @@ export default function IdeasScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#fff' },
-  card: { margin: 10, elevation: 3 },
-  chipContainer: { flexDirection: 'row', flexWrap: 'wrap', marginTop: 10 },
-  chip: { marginRight: 5, marginBottom: 5 }
+  container: { flex: 1, backgroundColor: Colors.background, padding: 16 },
+  card: { marginBottom: 16, borderRadius: 16, elevation: 2 },
+  cardTitle: { fontWeight: 'bold' },
+  content: { color: '#4A5568', fontSize: 15 },
+  empty: { alignItems: 'center', marginTop: 50 }
 });
