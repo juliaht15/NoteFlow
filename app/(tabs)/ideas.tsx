@@ -15,7 +15,7 @@ export default function IdeasScreen() {
         keyExtractor={(item) => item.id}
         ListEmptyComponent={
           <View style={styles.empty}>
-            <Text style={{ color: Colors.placeholder }}>No tienes ideas guardadas.</Text>
+            <Text style={{ color: Colors.placeholder }}>No hay ideas guardadas.</Text>
           </View>
         }
         renderItem={({ item }) => (
@@ -23,10 +23,17 @@ export default function IdeasScreen() {
             <Card.Title
               title={item.title}
               titleStyle={styles.cardTitle}
-              left={(props) => <Avatar.Icon {...props} icon="lightbulb-on" color={Colors.primary} style={{ backgroundColor: Colors.secondary }} />}
+              left={(props) => (
+                <Avatar.Icon 
+                  {...props} 
+                  icon="lightbulb-on-outline" 
+                  color={Colors.primary} 
+                  style={{ backgroundColor: Colors.secondary }} 
+                />
+              )}
             />
             <Card.Content>
-              <Text style={styles.content}>{item.content}</Text>
+              <Text style={styles.contentText}>{item.content}</Text>
             </Card.Content>
           </Card>
         )}
@@ -39,6 +46,6 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: Colors.background, padding: 16 },
   card: { marginBottom: 16, borderRadius: 16, elevation: 2 },
   cardTitle: { fontWeight: 'bold' },
-  content: { color: '#4A5568', fontSize: 15 },
+  contentText: { color: '#4B5563', fontSize: 15 },
   empty: { alignItems: 'center', marginTop: 50 }
 });
