@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, ScrollView } from 'react-native';
-import { TextInput, Button, SegmentedButtons, HelperText } from 'react-native-paper';
+import { View, StyleSheet, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
+import { TextInput, Button, SegmentedButtons, IconButton, Text } from 'react-native-paper';
 import { useRouter } from 'expo-router';
 import { useNotesStore } from '../store/notesStore';
 import { Colors } from '../constants/theme';
@@ -12,13 +12,17 @@ export default function NuevaNotaScreen() {
   const [tipo, setTipo] = useState('nota');
   const [titulo, setTitulo] = useState('');
   const [contenido, setContenido] = useState('');
+  const [etiqueta, setEtiqueta] = useState('');
 
   const handleSave = () => {
-    if (titulo.trim() === '') return;
+    if (!titulo.trim()) return;
     
+    // Formateo especial para ideas: [Etiqueta] Contenido
+    const contenidoFinal = tipo === 'idea' ? `[${etiqueta}] ${contenido}` : contenido;
+
     addNote({
       title: titulo,
-      content: contenido,
+      content: contenidoFinal,
       category: tipo,
     });
     
@@ -26,89 +30,83 @@ export default function NuevaNotaScreen() {
   };
 
   return (
-    <ScrollView style={styles.container}>
-      <SegmentedButtons
-        value={tipo}
-        onValueChange={setTipo}
-        buttons={[
-          { value: 'nota', label: 'Nota', icon: 'file-document-outline' },
-          { value: 'lista', label: 'Lista', icon: 'check-all' },
-          { value: 'idea', label: 'Idea', icon: 'lightbulb-outline' },
-        ]}
-        theme={{ colors: { secondaryContainer: '#E0E7FF' } }} // Fondo suave para el botón activo
-        style={styles.segments}
-      />
+    <KeyboardAvoidingView 
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'} 
+      style={{ flex: 1, backgroundColor: Colors.background }}
+    >
+      <ScrollView contentContainerStyle={styles.container}>
+        <View style={styles.header}>
+          <IconButton icon="chevron-left" size={30} onPress={() => router.back()} style={{ marginLeft: -10 }} />
+          <Text style={styles.headerTitle}>Nueva {tipo}</Text>
+        </View>
 
-      <TextInput
-        label="Título de la nota"
-        value={titulo}
-        onChangeText={setTitulo}
-        mode="outlined"
-        outlineColor={Colors.border}
-        activeOutlineColor={Colors.primary}
-        style={styles.input}
-      />
+        <SegmentedButtons
+          value={tipo}
+          onValueChange={setTipo}
+          buttons={[
+            { value: 'nota', label: 'Nota', icon: 'file-document-outline' },
+            { value: 'lista', label: 'Lista', icon: 'format-list-bulleted' },
+            { value: 'idea', label: 'Idea', icon: 'lightbulb-outline' },
+          ]}
+          style={styles.segments}
+        />
 
-      {tipo === 'nota' && (
         <TextInput
-          label="Contenido"
+          label="Título"
+          value={titulo}
+          onChangeText={setTitulo}
+          mode="outlined"
+          activeOutlineColor={Colors.primary}
+          style={styles.input}
+        />
+
+        {tipo === 'idea' && (
+          <TextInput
+            label="Etiqueta (ej: Trabajo, Casa)"
+            value={etiqueta}
+            onChangeText={setEtiqueta}
+            mode="outlined"
+            activeOutlineColor={Colors.primary}
+            style={styles.input}
+          />
+        )}
+
+        <TextInput
+          label={tipo === 'lista' ? "Tareas (una por línea)" : "Contenido"}
           value={contenido}
           onChangeText={setContenido}
           mode="outlined"
           multiline
-          numberOfLines={5}
+          numberOfLines={6}
           activeOutlineColor={Colors.primary}
           style={styles.input}
         />
-      )}
 
-      {tipo === 'lista' && (
-        <TextInput
-          label="Nueva tarea"
-          placeholder="Escribe una tarea..."
-          mode="flat"
-          right={<TextInput.Icon icon="plus-circle" color={Colors.primary} />}
-          style={styles.input}
-        />
-      )}
-
-      {tipo === 'idea' && (
-        <TextInput
-          label="Etiqueta (ej: Proyecto)"
-          mode="flat"
-          right={<TextInput.Icon icon="tag-plus" color={Colors.primary} />}
-          style={[styles.input, { backgroundColor: '#F0F4FF' }]} // Un azul muy suave de fondo
-        />
-      )}
-
-      <Button
-        mode="contained"
-        onPress={handleSave}
-        style={styles.button}
-        buttonColor={Colors.primary}
-        contentStyle={{ paddingVertical: 8 }}
-      >
-        Guardar en NoteFlow
-      </Button>
-    </ScrollView>
+        <View style={styles.buttonContainer}>
+          <Button 
+            mode="contained" 
+            onPress={handleSave} 
+            style={styles.saveBtn}
+            buttonColor={Colors.primary}
+          >
+            Guardar NoteFlow
+          </Button>
+          
+          <Button mode="text" onPress={() => router.back()} textColor={Colors.placeholder}>
+            Cancelar y salir
+          </Button>
+        </View>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: Colors.background,
-    padding: 20,
-  },
-  segments: {
-    marginBottom: 25,
-  },
-  input: {
-    marginBottom: 20,
-    backgroundColor: Colors.background,
-  },
-  button: {
-    marginTop: 10,
-    borderRadius: 8,
-  },
+  container: { padding: 20 },
+  header: { flexDirection: 'row', alignItems: 'center', marginBottom: 20 },
+  headerTitle: { fontSize: 24, fontWeight: 'bold', color: Colors.text },
+  segments: { marginBottom: 25 },
+  input: { marginBottom: 15, backgroundColor: Colors.surface },
+  buttonContainer: { marginTop: 10, gap: 10 },
+  saveBtn: { borderRadius: 12, paddingVertical: 6 },
 });
