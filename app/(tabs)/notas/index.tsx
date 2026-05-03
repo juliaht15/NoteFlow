@@ -2,8 +2,8 @@ import { View, StyleSheet } from 'react-native';
 import { FlashList } from "@shopify/flash-list";
 import { Text, FAB, Card } from 'react-native-paper';
 import { useRouter } from 'expo-router';
-import { useNotesStore } from '../../store/notesStore';
-import { Note } from '../../types';
+import { useNotesStore } from '../../../store/notesStore';
+import { Note } from '../../../types';
 
 export default function NotasScreen() {
   const router = useRouter();

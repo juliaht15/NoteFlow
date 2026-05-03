@@ -1,12 +1,9 @@
-Contexto del Proyecto: NoteFlow (App Móvil)
-Stack Tecnológico: React Native, Expo SDK, TypeScript, Expo Router.
-UI: Gluestack UI / React Native Paper (por definir).
-Estado Global: Zustand con persistencia (AsyncStorage).
-Listas: Shopify FlashList.
-Validación: Zod.
+Project: NoteFlow (Mobile Productivity App)
+Stack: Expo, TypeScript, React Native Paper, Zustand, Shopify FlashList, Zod.
 
-Reglas:
-- No usar etiquetas HTML (div, span, h1). Usar componentes de React Native.
-- Priorizar componentes funcionales y Hooks.
-- Mantener tipado estricto con TypeScript.
-- Seguir la estructura de carpetas: app/, components/, store/, types/.
+Rules:
+1. Always use functional components and hooks.
+2. Store logic must remain in 'store/notesStore.ts'.
+3. For FlashList type errors (ts2322), use 'const List = FlashList as any'.
+4. Ensure all new screens are added to 'app/(tabs)' or as modals in 'app/'.
+5. Use Haptics for success/error feedback.
