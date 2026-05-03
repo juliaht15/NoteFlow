@@ -1,49 +1,60 @@
-# 🚀 NoteFlow: Mobile Productivity Suite
+# NoteFlow 📱
 
-**NoteFlow** es una aplicación nativa de alto rendimiento diseñada para la gestión inteligente de notas, tareas y pensamientos creativos. Construida con un enfoque en la experiencia de usuario (UX) y la eficiencia técnica, NoteFlow demuestra la implementación de arquitecturas móviles modernas bajo el ecosistema de **Expo**.
-
-
-
-## 🛠️ Stack Tecnológico de Alto Nivel
-
-Para cumplir con los requisitos de la **Fase 6**, se seleccionaron las siguientes tecnologías líderes en la industria:
-
-*   **Core**: [React Native](https://reactnative.dev/) con [Expo SDK](https://expo.dev/) (Framework de desarrollo móvil).
-*   **Lenguaje**: [TypeScript](https://www.typescriptlang.org/) (Tipado estricto para reducir errores en tiempo de ejecución).
-*   **Navegación**: [Expo Router](https://expo.github.io/router/docs/) (Arquitectura basada en archivos para una navegación fluida entre pestañas y modales).
-*   **Estado Global**: [Zustand](https://docs.pmnd.rs/zustand/getting-started/introduction) (Gestión de estado ligera y escalable que evita re-renders innecesarios).
-*   **Persistencia**: [AsyncStorage](https://react-native-async-storage.github.io/async-storage/) (Guardado local de datos para funcionamiento offline).
-*   **Rendimiento de Listas**: [Shopify FlashList](https://shopify.github.io/flash-list/) (Reciclaje de componentes para scroll fluido a 60 FPS).
-*   **Validación de Datos**: [Zod](https://zod.dev/) (Esquemas de validación para formularios seguros).
-*   **Sistema de Diseño**: [React Native Paper](https://reactnativepaper.com/) (Implementación de Material Design 3).
-
-## 📱 Características Principales
-
-1.  **Tres Formatos de Contenido**: Notas de texto plano, checklists con progreso dinámico e ideas con etiquetas de colores.
-2.  **Feedback Háptico**: Integración de vibraciones táctiles para acciones de éxito (guardar) o error (validación).
-3.  **Persistencia de Datos**: Los datos se mantienen seguros en el dispositivo incluso después de cerrar la aplicación.
-4.  **Navegación Dinámica**: Sistema de detalle de notas implementado mediante rutas dinámicas `[id].tsx`.
-
-## 📂 Organización y Documentación
-
-El proyecto sigue una estructura profesional de carpetas y contiene documentación técnica detallada en el directorio `/docs`:
-
-*   [Idea y Objetivos](./docs/idea.md): Propuesta de valor y funcionalidades.
-*   [Arquitectura Técnica](./docs/react-native-teoria.md): Fundamentos de hilos, Metro Bundler y rendimiento.
-*   [Configuración de IA](./docs/ai-setup.md): Cómo se utilizaron herramientas como Gemini para asistir el desarrollo.
-
-## 📈 Gestión del Proyecto
-
-El desarrollo ha sido gestionado siguiendo metodologías ágiles a través de **Trello**:
-🔗 [https://trello.com/b/wE5jLIdP/noteflow]
+**NoteFlow** es una aplicación móvil nativa de alto rendimiento diseñada para la gestión inteligente de notas, tareas e ideas. Desarrollada bajo el ecosistema de **React Native**, la aplicación ofrece una experiencia fluida con persistencia de datos local y una interfaz optimizada para dispositivos iOS y Android.
 
 ---
 
-### ⚙️ Instalación y Uso Local
+## 🚀 Demo en Vivo
+La aplicación está publicada y lista para ser probada directamente en tu móvil:
 
-1. Clona el repositorio: `git clone https://github.com/juliaht15/NoteFlow.git`
-2. Instala las dependencias: `npm install` (o `npm install --force` en caso de conflictos con React 19)
-3. Inicia el proyecto: `npx expo start`
+1. Instala la app **Expo Go** desde la App Store o Play Store.
+2. Escanea el código QR disponible en el siguiente enlace de lanzamiento:
+👉 [**Probar NoteFlow en Expo Go**](https://expo.dev/preview/update?message=Despliegue+final+fase+6&updateRuntimeVersion=1.0.0&createdAt=2026-05-03T18%3A31%3A10.198Z&slug=exp&projectId=54b70d35-3f44-4720-9b03-68f2fedb30df&group=0b8ea657-287c-4d87-9439-07e5d0adee57)
 
 ---
-Desarrollado con compromiso técnico por **juliaht15**.
+
+## 🛠️ Instalación y Desarrollo
+Si deseas ejecutar el entorno de desarrollo localmente:
+
+1. **Clonar el proyecto:**
+   ```bash
+   git clone [https://github.com/juliaht15/NoteFlow.git](https://github.com/juliaht15/NoteFlow.git)
+   cd noteflow
+   ```
+2. **Instalar dependencias:**
+   ```bash
+   npm install
+   ```
+3. **Iniciar servidor de Expo:**
+   ```bash
+   npx expo start
+   ```
+
+---
+
+## 🏗️ Stack Tecnológico
+*   **Framework:** [React Native](https://reactnative.dev/) & [Expo SDK 51](https://expo.dev/).
+*   **Navegación:** [Expo Router](https://docs.expo.dev/router/introduction/) (File-based routing).
+*   **Gestión de Estado:** [Zustand](https://docs.pmnd.rs/zustand/) con persistencia en `AsyncStorage`.
+*   **Rendimiento:** [Shopify FlashList](https://shopify.github.io/flash-list/) para listas optimizadas.
+*   **Interfaz:** [React Native Paper](https://reactnativepaper.com/) y [Expo Haptics](https://docs.expo.dev/versions/latest/sdk/haptics/) para feedback táctil.
+*   **Validación:** [Zod](https://zod.dev/) para esquemas de datos.
+
+---
+
+## 📋 Gestión y Documentación
+Este proyecto ha sido gestionado bajo metodologías ágiles y cuenta con documentación técnica detallada:
+
+*   🔗 [**Tablero de Trello**](https://trello.com/b/wE5jLIdP/noteflow): Seguimiento de hitos y tareas.
+*   📚 [**Documentación Técnica**](./docs/): Carpeta con detalles sobre arquitectura, hilos nativos y manual de usuario.
+
+---
+
+## 👤 Autora
+**Julia**  
+[Perfil de Expo](https://expo.dev/accounts/juliaht15) | [GitHub](https://github.com/juliaht15)
+
+---
+
+> **Nota de entrega:** Proyecto finalizado para la Fase 6. Incluye persistencia de datos, navegación nativa y despliegue exitoso en EAS.
+```
