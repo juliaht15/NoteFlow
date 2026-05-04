@@ -1,8 +1,15 @@
 import { registerRootComponent } from 'expo';
+import { ExpoRoot } from 'expo-router';
+import React from 'react';
 
-import App from './App';
+// Definimos el punto de entrada de la aplicación
+export function App() {
+  // @ts-ignore: require.context es una función específica de Metro/Webpack
+  const ctx = require.context('./app');
+  
+  // Usamos React.createElement para evitar problemas de parsing si el archivo
+  // no se detecta correctamente como TSX, o simplemente la etiqueta directa:
+  return React.createElement(ExpoRoot, { context: ctx });
+}
 
-// registerRootComponent calls AppRegistry.registerComponent('main', () => App);
-// It also ensures that whether you load the app in Expo Go or in a native build,
-// the environment is set up appropriately
 registerRootComponent(App);

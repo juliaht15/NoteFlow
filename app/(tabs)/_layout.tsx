@@ -1,25 +1,34 @@
-import { Stack } from 'expo-router';
+import { Tabs } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
+import { Colors } from '../../constants/theme';
 
-export default function NotasLayout() {
+export default function TabLayout() {
   return (
-    <Stack>
-      {/* Pantalla principal de la lista de notas */}
-      <Stack.Screen 
-        name="index" 
-        options={{ 
-          title: 'Mis Notas',
-          headerShown: true 
-        }} 
+    <Tabs screenOptions={{ 
+      tabBarActiveTintColor: Colors.primary,
+      headerShown: false 
+    }}>
+      <Tabs.Screen
+        name="notas"
+        options={{
+          title: 'Notas',
+          tabBarIcon: ({ color }) => <Ionicons name="document-text" size={24} color={color} />,
+        }}
       />
-      
-      {/* Pantalla de edición: Quitamos el encabezado para que no diga "Detalle" */}
-      <Stack.Screen 
-        name="[id]" 
-        options={{ 
-          headerShown: false, // Esto elimina el título "Detalle de nota"
-          presentation: 'modal' // Opcional: hace que aparezca como una tarjeta desde abajo
-        }} 
+      <Tabs.Screen
+        name="checklists"
+        options={{
+          title: 'Tareas',
+          tabBarIcon: ({ color }) => <Ionicons name="list" size={24} color={color} />,
+        }}
       />
-    </Stack>
+      <Tabs.Screen
+        name="ideas"
+        options={{
+          title: 'Ideas',
+          tabBarIcon: ({ color }) => <Ionicons name="bulb" size={24} color={color} />,
+        }}
+      />
+    </Tabs>
   );
 }

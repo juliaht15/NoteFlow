@@ -9,7 +9,7 @@ export default function NuevaNotaScreen() {
   const router = useRouter();
   const addNote = useNotesStore((state) => state.addNote);
 
-  const [tipo, setTipo] = useState('nota');
+  const [tipo, setTipo] = useState<'nota' | 'idea' | 'lista'>('nota');
   const [titulo, setTitulo] = useState('');
   const [contenido, setContenido] = useState('');
   const [etiqueta, setEtiqueta] = useState('');
@@ -17,13 +17,16 @@ export default function NuevaNotaScreen() {
   const handleSave = () => {
     if (!titulo.trim()) return;
     
-    // Formateo especial para ideas: [Etiqueta] Contenido
-    const contenidoFinal = tipo === 'idea' ? `[${etiqueta}] ${contenido}` : contenido;
+    const contenidoFinal = tipo === 'idea' && etiqueta.trim() 
+      ? `[${etiqueta}] ${contenido}` 
+      : contenido;
 
     addNote({
+      id: Date.now().toString(),
       title: titulo,
       content: contenidoFinal,
       category: tipo,
+      completed: false
     });
     
     router.back();
@@ -42,7 +45,7 @@ export default function NuevaNotaScreen() {
 
         <SegmentedButtons
           value={tipo}
-          onValueChange={setTipo}
+          onValueChange={(value) => setTipo(value as any)}
           buttons={[
             { value: 'nota', label: 'Nota', icon: 'file-document-outline' },
             { value: 'lista', label: 'Lista', icon: 'format-list-bulleted' },
@@ -102,7 +105,7 @@ export default function NuevaNotaScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { padding: 20 },
+  container: { padding: 20, paddingTop: 60 },
   header: { flexDirection: 'row', alignItems: 'center', marginBottom: 20 },
   headerTitle: { fontSize: 24, fontWeight: 'bold', color: Colors.text },
   segments: { marginBottom: 25 },

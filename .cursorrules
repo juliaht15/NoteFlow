@@ -1,9 +1,11 @@
-Project: NoteFlow (Mobile Productivity App)
-Stack: Expo, TypeScript, React Native Paper, Zustand, Shopify FlashList, Zod.
-
-Rules:
-1. Always use functional components and hooks.
-2. Store logic must remain in 'store/notesStore.ts'.
-3. For FlashList type errors (ts2322), use 'const List = FlashList as any'.
-4. Ensure all new screens are added to 'app/(tabs)' or as modals in 'app/'.
-5. Use Haptics for success/error feedback.
+{
+  "project": "NoteFlow",
+  "stack": ["Expo", "TypeScript", "React Native Paper", "Zustand", "Shopify FlashList", "Zod"],
+  "rules": [
+    "Always use functional components and hooks.",
+    "Store logic must remain in 'store/notesStore.ts'.",
+    "For FlashList type errors (ts2322), use 'const List = FlashList as any'.",
+    "Ensure all new screens are added to 'app/(tabs)' or as modals in 'app/'.",
+    "Use Haptics for success/error feedback."
+  ]
+}

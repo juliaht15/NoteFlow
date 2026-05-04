@@ -16,13 +16,15 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.juliaht15.noteflow"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.juliaht15.noteflow"
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -31,7 +33,9 @@
       "expo-router"
     ],
     "extra": {
-      "router": {},
+      "router": {
+        "origin": false
+      },
       "eas": {
         "projectId": "54b70d35-3f44-4720-9b03-68f2fedb30df"
       }

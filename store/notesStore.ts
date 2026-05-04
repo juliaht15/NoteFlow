@@ -24,10 +24,14 @@ export const useNotesStore = create<NotesState>()(
       notes: [],
       
       addNote: (note) => 
-        set((state) => ({ notes: [note, ...state.notes] })),
+        set((state) => ({ 
+          notes: [note, ...state.notes] 
+        })),
 
       deleteNote: (id) => 
-        set((state) => ({ notes: state.notes.filter((n) => n.id !== id) })),
+        set((state) => ({ 
+          notes: state.notes.filter((n) => n.id !== id) 
+        })),
 
       updateNote: (id, title, content) =>
         set((state) => ({

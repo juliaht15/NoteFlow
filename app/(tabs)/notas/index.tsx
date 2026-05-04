@@ -1,15 +1,14 @@
 import React from 'react';
 import { View, StyleSheet, FlatList } from 'react-native';
 import { Text, FAB, Card, IconButton, Avatar } from 'react-native-paper';
-import { useRouter } from 'expo-router'; // Esto arregla el error 'router'
+import { useRouter } from 'expo-router';
 import { useNotesStore } from '../../../store/notesStore';
 import { Colors } from '../../../constants/theme';
 
 export default function NotasScreen() {
-  const router = useRouter(); // Inicializamos el router
+  const router = useRouter();
   const { notes, deleteNote } = useNotesStore();
 
-  // Filtramos para que aquí solo aparezcan las notas de texto
   const soloNotas = notes.filter(n => n.category === 'nota');
 
   return (
@@ -25,7 +24,7 @@ export default function NotasScreen() {
         renderItem={({ item }) => (
           <Card 
             style={styles.card} 
-            onPress={() => router.push({ pathname: "/(tabs)/notas/[id]", params: { id: item.id } })}
+            onPress={() => router.push(`/(tabs)/notas/${item.id}`)}
           >
             <Card.Title
               title={item.title}
@@ -56,7 +55,6 @@ export default function NotasScreen() {
         )}
       />
 
-      {/* Botón FAB minimalista (+) arreglado */}
       <FAB
         icon="plus"
         style={styles.fab}
@@ -67,7 +65,6 @@ export default function NotasScreen() {
   );
 }
 
-// Esto arregla el error 'styles'
 const styles = StyleSheet.create({
   container: { 
     flex: 1, 

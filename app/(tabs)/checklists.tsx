@@ -5,7 +5,6 @@ import { useRouter } from 'expo-router';
 import { useNotesStore } from '../../store/notesStore';
 import { Colors } from '../../constants/theme';
 
-// Componente para cada fila de la lista
 const CheckItem = ({ label }: { label: string }) => {
   const [checked, setChecked] = useState(false);
   return (
@@ -34,8 +33,22 @@ export default function ChecklistsScreen() {
           <Card style={styles.card} onPress={() => router.push(`/(tabs)/notas/${item.id}`)}>
             <Card.Title 
               title={item.title} 
-              left={(props) => <Avatar.Icon {...props} icon="format-list-checks" color={Colors.primary} style={{backgroundColor: Colors.secondary}} />}
-              right={(props) => <IconButton {...props} icon="trash-can-outline" iconColor={Colors.delete} onPress={() => deleteNote(item.id)} />}
+              left={(props) => (
+                <Avatar.Icon 
+                  {...props} 
+                  icon="format-list-checks" 
+                  color={Colors.primary} 
+                  style={{ backgroundColor: Colors.secondary }} 
+                />
+              )}
+              right={(props) => (
+                <IconButton 
+                  {...props} 
+                  icon="trash-can-outline" 
+                  iconColor={Colors.delete} 
+                  onPress={() => deleteNote(item.id)} 
+                />
+              )}
             />
             <Card.Content>
               {item.content.split('\n').filter(line => line.trim() !== "").map((line, index) => (
@@ -45,7 +58,12 @@ export default function ChecklistsScreen() {
           </Card>
         )}
       />
-      <FAB icon="plus" style={styles.fab} color="white" onPress={() => router.push('/nueva-nota')} />
+      <FAB 
+        icon="plus" 
+        style={styles.fab} 
+        color="white" 
+        onPress={() => router.push('/nueva-nota')} 
+      />
     </View>
   );
 }
@@ -56,5 +74,12 @@ const styles = StyleSheet.create({
   checkItem: { flexDirection: 'row', alignItems: 'center', marginBottom: 4 },
   lineText: { fontSize: 16, color: Colors.text, marginLeft: 8 },
   completedText: { textDecorationLine: 'line-through', color: Colors.placeholder },
-  fab: { position: 'absolute', margin: 16, right: 0, bottom: 0, backgroundColor: Colors.primary, borderRadius: 30 },
+  fab: { 
+    position: 'absolute', 
+    margin: 16, 
+    right: 0, 
+    bottom: 0, 
+    backgroundColor: Colors.primary, 
+    borderRadius: 30 
+  },
 });

@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { useGlobalSearchParams, useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { View, StyleSheet, ScrollView } from 'react-native';
-import { TextInput, Button, IconButton } from 'react-native-paper';
+import { TextInput, Button, Appbar } from 'react-native-paper';
 import { useNotesStore } from '../../../store/notesStore';
-import { Colors } from '../../../constants/theme';
 
 export default function EditorNota() {
-  const { id } = useGlobalSearchParams();
+  const { id } = useLocalSearchParams();
   const router = useRouter();
   const { notes, updateNote } = useNotesStore();
   
@@ -25,20 +24,19 @@ export default function EditorNota() {
   if (!note) return null;
 
   const handleSave = () => {
-    updateNote(note.id, title, content);
+    updateNote(id as string, title, content);
     router.back();
   };
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <IconButton icon="close" onPress={() => router.back()} />
-        <Button mode="contained" onPress={handleSave} buttonColor={Colors.primary}>
-          Hecho
-        </Button>
-      </View>
+      <Appbar.Header style={{ backgroundColor: 'white', elevation: 0 }}>
+        <Appbar.Action icon="close" onPress={() => router.back()} />
+        <Appbar.Content title="" />
+        <Button mode="text" onPress={handleSave}>Hecho</Button>
+      </Appbar.Header>
 
-      <ScrollView>
+      <ScrollView style={{ paddingHorizontal: 20 }}>
         <TextInput
           placeholder="Título"
           value={title}
@@ -50,7 +48,7 @@ export default function EditorNota() {
         />
 
         <TextInput
-          placeholder="Empieza a escribir..."
+          placeholder="Escribe aquí..."
           value={content}
           onChangeText={setContent}
           mode="flat"
@@ -65,23 +63,17 @@ export default function EditorNota() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: 'white', paddingHorizontal: 16 },
-  header: { 
-    flexDirection: 'row', 
-    justifyContent: 'space-between', 
-    alignItems: 'center', 
-    marginTop: 50, 
-    marginBottom: 10 
-  },
+  container: { flex: 1, backgroundColor: 'white' },
   titleInput: { 
-    fontSize: 24, 
+    fontSize: 26, 
     fontWeight: 'bold', 
-    backgroundColor: 'transparent',
-    height: 60
+    backgroundColor: 'white', 
+    marginTop: 10 
   },
   contentInput: { 
-    fontSize: 16, 
-    backgroundColor: 'transparent', 
-    minHeight: 400 
+    fontSize: 18, 
+    backgroundColor: 'white', 
+    minHeight: 400,
+    textAlignVertical: 'top'
   },
 });
