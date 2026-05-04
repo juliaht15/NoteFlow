@@ -1,85 +1,46 @@
-import React, { useState } from 'react';
-import { View, FlatList, StyleSheet } from 'react-native';
-import { Checkbox, Card, Text, Avatar, IconButton, FAB } from 'react-native-paper';
-import { useRouter } from 'expo-router';
+import React from 'react';
+import { View, StyleSheet } from 'react-native';
+import { Text, FAB } from 'react-native-paper';
+import { FlashList } from '@shopify/flash-list';
 import { useNotesStore } from '../../store/notesStore';
-import { Colors } from '../../constants/theme';
-
-const CheckItem = ({ label }: { label: string }) => {
-  const [checked, setChecked] = useState(false);
-  return (
-    <View style={styles.checkItem}>
-      <Checkbox.Android 
-        status={checked ? 'checked' : 'unchecked'} 
-        onPress={() => setChecked(!checked)} 
-        color={Colors.primary} 
-      />
-      <Text style={[styles.lineText, checked && styles.completedText]}>{label}</Text>
-    </View>
-  );
-};
+import { isChecklistNote } from '../../types';
+import ChecklistCard from '../../components/items/ChecklistCard';
+import { useRouter } from 'expo-router';
 
 export default function ChecklistsScreen() {
+  const { checklists, deleteNote } = useNotesStore();
   const router = useRouter();
-  const { notes, deleteNote } = useNotesStore();
-  const lists = notes.filter(n => n.category === 'lista');
 
   return (
     <View style={styles.container}>
-      <FlatList
-        data={lists}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <Card style={styles.card} onPress={() => router.push(`/(tabs)/notas/${item.id}`)}>
-            <Card.Title 
-              title={item.title} 
-              left={(props) => (
-                <Avatar.Icon 
-                  {...props} 
-                  icon="format-list-checks" 
-                  color={Colors.primary} 
-                  style={{ backgroundColor: Colors.secondary }} 
-                />
-              )}
-              right={(props) => (
-                <IconButton 
-                  {...props} 
-                  icon="trash-can-outline" 
-                  iconColor={Colors.delete} 
-                  onPress={() => deleteNote(item.id)} 
-                />
-              )}
+      {checklists.length === 0 ? (
+        <View style={styles.empty}>
+          <Text variant="bodyLarge">Sin listas</Text>
+        </View>
+      ) : (
+        // @ts-ignore - FlashList types incompletos
+        <FlashList
+          data={checklists.filter(isChecklistNote)}
+          renderItem={({ item }: { item: any }) => (
+            <ChecklistCard 
+              checklist={item} 
+              onPress={() => router.push(`/notas/${item.id}`)} 
+              onDelete={() => deleteNote(item.id, 'checklist')} 
             />
-            <Card.Content>
-              {item.content.split('\n').filter(line => line.trim() !== "").map((line, index) => (
-                <CheckItem key={index} label={line} />
-              ))}
-            </Card.Content>
-          </Card>
-        )}
-      />
-      <FAB 
-        icon="plus" 
-        style={styles.fab} 
-        color="white" 
-        onPress={() => router.push('/nueva-nota')} 
-      />
+          )}
+          keyExtractor={(item: any) => item.id}
+          estimatedItemSize={100}
+          contentContainerStyle={styles.list}
+        />
+      )}
+      <FAB icon="plus" onPress={() => router.push('/nueva-nota')} style={styles.fab} color="white" />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: Colors.background, padding: 16 },
-  card: { marginBottom: 16, borderRadius: 16, backgroundColor: Colors.surface, elevation: 2 },
-  checkItem: { flexDirection: 'row', alignItems: 'center', marginBottom: 4 },
-  lineText: { fontSize: 16, color: Colors.text, marginLeft: 8 },
-  completedText: { textDecorationLine: 'line-through', color: Colors.placeholder },
-  fab: { 
-    position: 'absolute', 
-    margin: 16, 
-    right: 0, 
-    bottom: 0, 
-    backgroundColor: Colors.primary, 
-    borderRadius: 30 
-  },
+  container: { flex: 1, backgroundColor: '#F8F9FA' },
+  list: { padding: 16, paddingBottom: 80 },
+  empty: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+  fab: { position: 'absolute', right: 16, bottom: 16, backgroundColor: '#3A86FF', borderRadius: 28 },
 });

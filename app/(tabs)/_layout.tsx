@@ -3,40 +3,40 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 export default function TabLayout() {
   return (
-    <Tabs screenOptions={{ 
-      tabBarActiveTintColor: '#2196F3',
-      headerShown: true,
-      headerTitleAlign: 'center'
-    }}>
-      {/* 1. Botón Notas (el index.tsx principal) */}
+    <Tabs
+      screenOptions={{
+        tabBarActiveTintColor: '#3A86FF',
+        tabBarInactiveTintColor: '#9CA3AF',
+        headerShown: false,
+      }}
+    >
       <Tabs.Screen
-        name="index"
+        name="notas/index"
         options={{
           title: 'Notas',
-          tabBarIcon: ({ color }) => <MaterialCommunityIcons name="file-document" size={26} color={color} />,
+          tabBarIcon: ({ color, size }) => (
+            <MaterialCommunityIcons name="note-text-outline" color={color} size={size} />
+          ),
         }}
       />
-
-      {/* 2. Botón Ideas */}
       <Tabs.Screen
         name="ideas"
         options={{
           title: 'Ideas',
-          tabBarIcon: ({ color }) => <MaterialCommunityIcons name="lightbulb" size={26} color={color} />,
+          tabBarIcon: ({ color, size }) => (
+            <MaterialCommunityIcons name="lightbulb-outline" color={color} size={size} />
+          ),
         }}
       />
-
-      {/* 3. Botón Listas (tu archivo app/(tabs)/notas/index.tsx) */}
       <Tabs.Screen
-        name="notas/index" 
+        name="checklists"
         options={{
           title: 'Listas',
-          tabBarIcon: ({ color }) => <MaterialCommunityIcons name="format-list-checks" size={26} color={color} />,
+          tabBarIcon: ({ color, size }) => (
+            <MaterialCommunityIcons name="format-list-bulleted" color={color} size={size} />
+          ),
         }}
       />
-
-      {/* Ocultamos el [id] de las pestañas */}
-      <Tabs.Screen name="notas/[id]" options={{ href: null }} />
     </Tabs>
   );
 }

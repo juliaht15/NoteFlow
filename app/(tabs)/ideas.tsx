@@ -1,87 +1,46 @@
 import React from 'react';
-import { View, FlatList, StyleSheet } from 'react-native';
-import { Text, Card, Avatar, IconButton, FAB } from 'react-native-paper';
-import { useRouter } from 'expo-router';
+import { View, StyleSheet } from 'react-native';
+import { Text, FAB } from 'react-native-paper';
+import { FlashList } from '@shopify/flash-list';
 import { useNotesStore } from '../../store/notesStore';
-import { Colors } from '../../constants/theme';
+import { isIdeaNote } from '../../types';
+import IdeaCard from '../../components/items/IdeaCard';
+import { useRouter } from 'expo-router';
 
 export default function IdeasScreen() {
+  const { ideas, deleteNote } = useNotesStore();
   const router = useRouter();
-  const { notes, deleteNote } = useNotesStore();
-  const ideas = notes.filter(n => n.category === 'idea');
 
   return (
     <View style={styles.container}>
-      <FlatList
-        data={ideas}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <Card 
-            style={styles.card} 
-            onPress={() => router.push(`/(tabs)/notas/${item.id}`)}
-          >
-            <Card.Title
-              title={item.title}
-              titleStyle={styles.cardTitle}
-              left={(props) => (
-                <Avatar.Icon 
-                  {...props} 
-                  icon="lightbulb-on-outline" 
-                  color={Colors.primary} 
-                  style={{ backgroundColor: Colors.secondary }} 
-                />
-              )}
-              right={(props) => (
-                <IconButton 
-                  {...props} 
-                  icon="trash-can-outline" 
-                  iconColor={Colors.delete} 
-                  onPress={() => deleteNote(item.id)} 
-                />
-              )}
+      {ideas.length === 0 ? (
+        <View style={styles.empty}>
+          <Text variant="bodyLarge">Sin ideas</Text>
+        </View>
+      ) : (
+        // @ts-ignore - FlashList types incompletos
+        <FlashList
+          data={ideas.filter(isIdeaNote)}
+          renderItem={({ item }: { item: any }) => (
+            <IdeaCard 
+              idea={item} 
+              onPress={() => router.push(`/notas/${item.id}`)} 
+              onDelete={() => deleteNote(item.id, 'idea')} 
             />
-            <Card.Content>
-              <Text numberOfLines={3} style={styles.content}>
-                {item.content}
-              </Text>
-            </Card.Content>
-          </Card>
-        )}
-      />
-      <FAB 
-        icon="plus" 
-        style={styles.fab} 
-        color="white" 
-        onPress={() => router.push('/nueva-nota')} 
-      />
+          )}
+          keyExtractor={(item: any) => item.id}
+          estimatedItemSize={100}
+          contentContainerStyle={styles.list}
+        />
+      )}
+      <FAB icon="plus" onPress={() => router.push('/nueva-nota')} style={styles.fab} color="white" />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { 
-    flex: 1, 
-    backgroundColor: Colors.background, 
-    padding: 16 
-  },
-  card: { 
-    marginBottom: 16, 
-    borderRadius: 16, 
-    backgroundColor: Colors.surface, 
-    elevation: 2 
-  },
-  cardTitle: { 
-    fontWeight: 'bold' 
-  },
-  content: { 
-    color: '#4B5563' 
-  },
-  fab: { 
-    position: 'absolute', 
-    margin: 16, 
-    right: 0, 
-    bottom: 0, 
-    backgroundColor: Colors.primary, 
-    borderRadius: 30 
-  },
+  container: { flex: 1, backgroundColor: '#F8F9FA' },
+  list: { padding: 16, paddingBottom: 80 },
+  empty: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+  fab: { position: 'absolute', right: 16, bottom: 16, backgroundColor: '#3A86FF', borderRadius: 28 },
 });

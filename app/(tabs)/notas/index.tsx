@@ -1,59 +1,67 @@
 import React, { useState } from 'react';
-import { View, StyleSheet } from 'react-native';
-import { Searchbar, FAB, Card, Text, IconButton } from 'react-native-paper';
-import { useNotesStore } from '../../../store/notesStore'; 
+import { View, StyleSheet, Alert } from 'react-native';
+import { Searchbar, FAB, Text } from 'react-native-paper';
 import { FlashList } from '@shopify/flash-list';
 import { useRouter } from 'expo-router';
+import { useNotesStore } from '../../../store/notesStore';
+import { isNote } from '../../../types';
+import NoteCard from '../../../components/items/NoteCard';
+import * as Haptics from 'expo-haptics';
 
-// Esto soluciona el error ts(2322) de tu imagen ssss_3.PNG
-const TypedFlashList = FlashList as any;
-
-export default function ChecklistsScreen() {
-  const [searchQuery, setSearchQuery] = useState('');
+export default function NotasScreen() {
+  const [search, setSearch] = useState('');
   const { notes, deleteNote } = useNotesStore();
   const router = useRouter();
 
-  const filteredData = notes.filter((n: any) => 
-    n.category === 'lista' && n.title.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredNotes = notes.filter(n => 
+    isNote(n) && (n.title.toLowerCase().includes(search.toLowerCase()) || 
+    n.content.toLowerCase().includes(search.toLowerCase()))
   );
+
+  const handleDelete = (id: string) => {
+    Alert.alert('Eliminar', '¿Seguro?', [
+      { text: 'Cancelar' },
+      { text: 'Eliminar', style: 'destructive', onPress: () => {
+        deleteNote(id, 'note');
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      }}
+    ]);
+  };
 
   return (
     <View style={styles.container}>
-      <Searchbar
-        placeholder="Buscar listas..."
-        onChangeText={setSearchQuery}
-        value={searchQuery}
-        style={styles.search}
-      />
-
-      <TypedFlashList
-        data={filteredData}
-        estimatedItemSize={100}
-        contentContainerStyle={{ padding: 16 }}
-        renderItem={({ item }: any) => (
-          <Card style={styles.card}>
-            <Card.Title
-              title={item.title}
-              left={(props) => <IconButton {...props} icon="format-list-checks" iconColor="#2196F3" />}
-              right={(props) => (
-                <IconButton {...props} icon="delete-outline" iconColor="#d32f2f" onPress={() => deleteNote(item.id)} />
-              )}
+      <Searchbar placeholder="Buscar..." onChangeText={setSearch} value={search} style={styles.search} />
+      
+      {filteredNotes.length === 0 ? (
+        <View style={styles.empty}>
+          <Text variant="bodyLarge">Sin notas</Text>
+        </View>
+      ) : (
+        // @ts-ignore - FlashList types incompletos
+        <FlashList
+          data={filteredNotes}
+          renderItem={({ item }: { item: any }) => (
+            <NoteCard 
+              note={item} 
+              onPress={() => router.push(`/notas/${item.id}`)} 
+              onDelete={() => handleDelete(item.id)} 
             />
-            <Card.Content>
-              <Text variant="bodySmall">{item.content || "Sin elementos"}</Text>
-            </Card.Content>
-          </Card>
-        )}
-      />
-
-      <FAB icon="plus" style={styles.fab} onPress={() => router.push('/nueva-nota')} color="white" />
+          )}
+          keyExtractor={(item: any) => item.id}
+          estimatedItemSize={100}
+          contentContainerStyle={styles.list}
+        />
+      )}
+      
+      <FAB icon="plus" onPress={() => router.push('/nueva-nota')} style={styles.fab} color="white" />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f5f5f5' },
-  search: { margin: 16, borderRadius: 12, backgroundColor: '#fff' },
-  card: { marginBottom: 12, borderRadius: 16, backgroundColor: '#fff' },
-  fab: { position: 'absolute', margin: 16, right: 0, bottom: 0, backgroundColor: '#2196F3', borderRadius: 28 }
+  container: { flex: 1, backgroundColor: '#F8F9FA' },
+  search: { margin: 16, borderRadius: 12 },
+  list: { padding: 16, paddingBottom: 80 },
+  empty: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+  fab: { position: 'absolute', right: 16, bottom: 16, backgroundColor: '#3A86FF', borderRadius: 28 },
 });

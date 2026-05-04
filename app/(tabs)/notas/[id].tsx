@@ -1,79 +1,54 @@
-import React, { useState, useEffect } from 'react';
-import { useLocalSearchParams, useRouter } from 'expo-router';
-import { View, StyleSheet, ScrollView } from 'react-native';
-import { TextInput, Button, Appbar } from 'react-native-paper';
+import React from 'react';
+import { ScrollView, StyleSheet, Alert, View } from 'react-native';
+import { Text, IconButton } from 'react-native-paper';
+import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
 import { useNotesStore } from '../../../store/notesStore';
+import { isNote } from '../../../types';
+import * as Haptics from 'expo-haptics';
 
-export default function EditorNota() {
+export default function NoteDetail() {
   const { id } = useLocalSearchParams();
   const router = useRouter();
-  const { notes, updateNote } = useNotesStore();
-  
-  const note = notes.find((n) => n.id === id);
+  const { notes, deleteNote } = useNotesStore();
+  const note = notes.find(n => n.id === id);
 
-  const [title, setTitle] = useState('');
-  const [content, setContent] = useState('');
+  if (!note || !isNote(note)) {
+    return (
+      <View style={styles.container}>
+        <Text variant="bodyLarge">Nota no encontrada</Text>
+      </View>
+    );
+  }
 
-  useEffect(() => {
-    if (note) {
-      setTitle(note.title);
-      setContent(note.content);
-    }
-  }, [note]);
-
-  if (!note) return null;
-
-  const handleSave = () => {
-    updateNote(id as string, title, content);
-    router.back();
+  const handleDelete = () => {
+    Alert.alert('Eliminar', '¿Seguro?', [
+      { text: 'Cancelar' },
+      { text: 'Eliminar', style: 'destructive', onPress: () => {
+        deleteNote(note.id, 'note');
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        router.replace('/(tabs)/notas');
+      }}
+    ]);
   };
 
   return (
-    <View style={styles.container}>
-      <Appbar.Header style={{ backgroundColor: 'white', elevation: 0 }}>
-        <Appbar.Action icon="close" onPress={() => router.back()} />
-        <Appbar.Content title="" />
-        <Button mode="text" onPress={handleSave}>Hecho</Button>
-      </Appbar.Header>
-
-      <ScrollView style={{ paddingHorizontal: 20 }}>
-        <TextInput
-          placeholder="Título"
-          value={title}
-          onChangeText={setTitle}
-          mode="flat"
-          style={styles.titleInput}
-          underlineColor="transparent"
-          activeUnderlineColor="transparent"
-        />
-
-        <TextInput
-          placeholder="Escribe aquí..."
-          value={content}
-          onChangeText={setContent}
-          mode="flat"
-          multiline
-          style={styles.contentInput}
-          underlineColor="transparent"
-          activeUnderlineColor="transparent"
-        />
+    <>
+      <Stack.Screen 
+        options={{ 
+          title: note.title, 
+          headerRight: () => <IconButton icon="delete-outline" onPress={handleDelete} /> 
+        }} 
+      />
+      <ScrollView style={styles.container}>
+        <Text variant="headlineSmall" style={styles.title}>{note.title}</Text>
+        <Text variant="bodyMedium" style={styles.content}>{note.content}</Text>
       </ScrollView>
-    </View>
+    </>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: 'white' },
-  titleInput: { 
-    fontSize: 26, 
-    fontWeight: 'bold', 
-    backgroundColor: 'white', 
-    marginTop: 10 
-  },
-  contentInput: { 
-    fontSize: 18, 
-    backgroundColor: 'white', 
-    minHeight: 400,
-    textAlignVertical: 'top'
-  },
+  container: { flex: 1, padding: 20, backgroundColor: '#fff' },
+  title: { fontWeight: '700', marginBottom: 16 },
+  content: { lineHeight: 24 },
 });

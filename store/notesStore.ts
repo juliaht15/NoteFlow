@@ -1,54 +1,46 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Note, ChecklistNote, IdeaNote } from '../types';
 
-interface Note {
-  id: string;
-  title: string;
-  content: string;
-  category: 'nota' | 'idea' | 'lista';
-  completed?: boolean;
-}
-
-interface NotesState {
+interface NotesStore {
   notes: Note[];
+  checklists: ChecklistNote[];
+  ideas: IdeaNote[];
   addNote: (note: Note) => void;
-  deleteNote: (id: string) => void;
-  updateNote: (id: string, title: string, content: string) => void;
-  toggleCheck: (id: string) => void;
+  addChecklist: (checklist: ChecklistNote) => void;
+  addIdea: (idea: IdeaNote) => void;
+  deleteNote: (id: string, type: 'note' | 'checklist' | 'idea') => void;
+  toggleChecklistItem: (checklistId: string, itemId: string) => void;
 }
 
-export const useNotesStore = create<NotesState>()(
+export const useNotesStore = create<NotesStore>()(
   persist(
     (set) => ({
       notes: [],
-      
-      addNote: (note) => 
-        set((state) => ({ 
-          notes: [note, ...state.notes] 
-        })),
-
-      deleteNote: (id) => 
-        set((state) => ({ 
-          notes: state.notes.filter((n) => n.id !== id) 
-        })),
-
-      updateNote: (id, title, content) =>
-        set((state) => ({
-          notes: state.notes.map((n) =>
-            n.id === id ? { ...n, title, content } : n
-          ),
-        })),
-
-      toggleCheck: (id) =>
-        set((state) => ({
-          notes: state.notes.map((n) =>
-            n.id === id ? { ...n, completed: !n.completed } : n
-          ),
-        })),
+      checklists: [],
+      ideas: [],
+      addNote: (note) => set((state) => ({ notes: [note, ...state.notes] })),
+      addChecklist: (checklist) => set((state) => ({ checklists: [checklist, ...state.checklists] })),
+      addIdea: (idea) => set((state) => ({ ideas: [idea, ...state.ideas] })),
+      deleteNote: (id, type) => set((state) => ({
+        notes: type === 'note' ? state.notes.filter(n => n.id !== id) : state.notes,
+        checklists: type === 'checklist' ? state.checklists.filter(c => c.id !== id) : state.checklists,
+        ideas: type === 'idea' ? state.ideas.filter(i => i.id !== id) : state.ideas,
+      })),
+      toggleChecklistItem: (checklistId, itemId) => set((state) => ({
+        checklists: state.checklists.map(c =>
+          c.id !== checklistId ? c : {
+            ...c,
+            items: c.items.map(i =>
+              i.id === itemId ? { ...i, isCompleted: !i.isCompleted } : i
+            ),
+          }
+        ),
+      })),
     }),
     {
-      name: 'notes-storage',
+      name: 'noteflow-storage',
       storage: createJSONStorage(() => AsyncStorage),
     }
   )
