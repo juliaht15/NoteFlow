@@ -1,69 +1,25 @@
-import { Tabs } from 'expo-router';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { Colors } from '../../constants/theme';
+import { Stack } from 'expo-router';
 
-export default function TabLayout() {
+export default function NotasLayout() {
   return (
-    <Tabs
-      screenOptions={{
-        tabBarActiveTintColor: Colors.primary,
-        tabBarInactiveTintColor: Colors.placeholder,
-        tabBarStyle: {
-          borderTopWidth: 1,
-          borderTopColor: Colors.border,
-          height: 60,
-          paddingBottom: 8,
-        },
-        headerStyle: {
-          backgroundColor: Colors.surface,
-        },
-        headerTitleStyle: {
-          fontWeight: 'bold',
-        },
-      }}
-    >
-      <Tabs.Screen
-        name="notas/index"
-        options={{
+    <Stack>
+      {/* Pantalla principal de la lista de notas */}
+      <Stack.Screen 
+        name="index" 
+        options={{ 
           title: 'Mis Notas',
-          headerTitle: 'NoteFlow',
-          tabBarLabel: 'Notas',
-          tabBarIcon: ({ color, size }) => (
-            <MaterialCommunityIcons name="note-text" color={color} size={size} />
-          ),
-        }}
+          headerShown: true 
+        }} 
       />
       
-      <Tabs.Screen
-        name="checklists"
-        options={{
-          title: 'Checklists',
-          tabBarLabel: 'Tareas',
-          tabBarIcon: ({ color, size }) => (
-            <MaterialCommunityIcons name="format-list-checks" color={color} size={size} />
-          ),
-        }}
+      {/* Pantalla de edición: Quitamos el encabezado para que no diga "Detalle" */}
+      <Stack.Screen 
+        name="[id]" 
+        options={{ 
+          headerShown: false, // Esto elimina el título "Detalle de nota"
+          presentation: 'modal' // Opcional: hace que aparezca como una tarjeta desde abajo
+        }} 
       />
-
-      <Tabs.Screen
-        name="ideas"
-        options={{
-          title: 'Ideas',
-          tabBarLabel: 'Ideas',
-          tabBarIcon: ({ color, size }) => (
-            <MaterialCommunityIcons name="lightbulb" color={color} size={size} />
-          ),
-        }}
-      />
-
-      {/* ESTO OCULTA LA PESTAÑA DE DETALLE DEL MENÚ INFERIOR */}
-      <Tabs.Screen
-        name="notas/[id]"
-        options={{
-          href: null, // Al poner href null, desaparece de la barra inferior
-          title: 'Detalle de Nota',
-        }}
-      />
-    </Tabs>
+    </Stack>
   );
 }
