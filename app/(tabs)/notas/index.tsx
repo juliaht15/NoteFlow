@@ -1,13 +1,15 @@
 import React from 'react';
 import { View, StyleSheet, FlatList } from 'react-native';
 import { Text, FAB, Card, IconButton, Avatar } from 'react-native-paper';
-import { useRouter } from 'expo-router';
+import { useRouter } from 'expo-router'; // Esto arregla el error 'router'
 import { useNotesStore } from '../../../store/notesStore';
 import { Colors } from '../../../constants/theme';
 
 export default function NotasScreen() {
-  const router = useRouter();
+  const router = useRouter(); // Inicializamos el router
   const { notes, deleteNote } = useNotesStore();
+
+  // Filtramos para que aquí solo aparezcan las notas de texto
   const soloNotas = notes.filter(n => n.category === 'nota');
 
   return (
@@ -15,22 +17,46 @@ export default function NotasScreen() {
       <FlatList
         data={soloNotas}
         keyExtractor={(item) => item.id}
+        ListEmptyComponent={
+          <View style={styles.empty}>
+            <Text style={{ color: Colors.placeholder }}>No tienes notas personales aún.</Text>
+          </View>
+        }
         renderItem={({ item }) => (
-          <Card style={styles.card} onPress={() => router.push(`/(tabs)/notas/${item.id}`)}>
+          <Card 
+            style={styles.card} 
+            onPress={() => router.push({ pathname: "/(tabs)/notas/[id]", params: { id: item.id } })}
+          >
             <Card.Title
               title={item.title}
-              subtitle="NOTA PERSONAL"
-              left={(props) => <Avatar.Icon {...props} icon="note-text" style={{ backgroundColor: Colors.secondary }} color={Colors.primary} />}
-              right={(props) => <IconButton {...props} icon="trash-can-outline" iconColor={Colors.delete} onPress={() => deleteNote(item.id)} />}
+              titleStyle={styles.cardTitle}
+              left={(props) => (
+                <Avatar.Icon 
+                  {...props} 
+                  icon="note-text-outline" 
+                  color={Colors.primary} 
+                  style={{ backgroundColor: Colors.secondary }} 
+                />
+              )}
+              right={(props) => (
+                <IconButton 
+                  {...props} 
+                  icon="trash-can-outline" 
+                  iconColor={Colors.delete} 
+                  onPress={() => deleteNote(item.id)} 
+                />
+              )}
             />
             <Card.Content>
-              <Text numberOfLines={2}>{item.content}</Text>
+              <Text numberOfLines={2} style={styles.content}>
+                {item.content}
+              </Text>
             </Card.Content>
           </Card>
         )}
       />
 
-      {/* AQUÍ ESTÁ EL CAMBIO: Quitamos el label para que solo sea el círculo con el + */}
+      {/* Botón FAB minimalista (+) arreglado */}
       <FAB
         icon="plus"
         style={styles.fab}
@@ -41,8 +67,36 @@ export default function NotasScreen() {
   );
 }
 
+// Esto arregla el error 'styles'
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: Colors.background, padding: 16 },
-  card: { marginBottom: 16, borderRadius: 16, elevation: 2 },
-  fab: { position: 'absolute', margin: 16, right: 0, bottom: 0, backgroundColor: Colors.primary, borderRadius: 30 },
+  container: { 
+    flex: 1, 
+    backgroundColor: Colors.background, 
+    padding: 16 
+  },
+  card: { 
+    marginBottom: 16, 
+    borderRadius: 16, 
+    backgroundColor: Colors.surface, 
+    elevation: 2 
+  },
+  cardTitle: { 
+    fontWeight: 'bold' 
+  },
+  content: { 
+    color: '#4A5568', 
+    fontSize: 14 
+  },
+  empty: { 
+    alignItems: 'center', 
+    marginTop: 50 
+  },
+  fab: { 
+    position: 'absolute', 
+    margin: 16, 
+    right: 0, 
+    bottom: 0, 
+    backgroundColor: Colors.primary, 
+    borderRadius: 30 
+  },
 });

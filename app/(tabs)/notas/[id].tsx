@@ -1,16 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useGlobalSearchParams, useRouter } from 'expo-router'; // Cambiado a GlobalSearchParams
 import { View, StyleSheet, ScrollView } from 'react-native';
 import { TextInput, Button, IconButton, Text } from 'react-native-paper';
 import { useNotesStore } from '../../../store/notesStore';
 import { Colors } from '../../../constants/theme';
 
 export default function DetalleNota() {
-  const { id } = useLocalSearchParams();
+  const { id } = useGlobalSearchParams(); // Usamos Global para asegurar que pille el ID de la URL
   const router = useRouter();
   const { notes, updateNote } = useNotesStore();
   
-  // Buscamos la nota. Importante usar el ID que viene por parámetros
   const note = notes.find((n) => n.id === id);
 
   const [title, setTitle] = useState('');
@@ -26,7 +25,7 @@ export default function DetalleNota() {
   if (!note) {
     return (
       <View style={styles.container}>
-        <Text>Nota no encontrada (ID: {id})</Text>
+        <Text style={{ marginTop: 50, textAlign: 'center' }}>Nota no encontrada (ID: {id})</Text>
         <Button onPress={() => router.back()}>Volver</Button>
       </View>
     );
@@ -52,18 +51,16 @@ export default function DetalleNota() {
         onChangeText={setTitle}
         mode="outlined"
         style={styles.input}
-        activeOutlineColor={Colors.primary}
       />
 
       <TextInput
-        label="Contenido / Lista"
+        label="Contenido"
         value={content}
         onChangeText={setContent}
         mode="outlined"
         multiline
         numberOfLines={10}
         style={[styles.input, { minHeight: 250 }]}
-        activeOutlineColor={Colors.primary}
       />
     </ScrollView>
   );
