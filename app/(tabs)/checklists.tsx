@@ -2,24 +2,29 @@ import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Text, FAB } from 'react-native-paper';
 import { FlashList } from '@shopify/flash-list';
+// CORRECCIÓN: Subimos 2 niveles, no 3 (app/(tabs) -> store)
 import { useNotesStore } from '../../store/notesStore';
 import { isChecklistNote } from '../../types';
 import ChecklistCard from '../../components/items/ChecklistCard';
 import { useRouter } from 'expo-router';
 
 export default function ChecklistsScreen() {
-  const { checklists, deleteNote } = useNotesStore();
+  // CORRECCIÓN: Extraemos 'notes' en lugar de 'checklists' inexistente
+  const { notes, deleteNote } = useNotesStore();
   const router = useRouter();
+
+  // Filtramos las notas que son específicamente de tipo lista
+  const filteredChecklists = notes.filter(n => n.category === 'lista');
 
   return (
     <View style={styles.container}>
-      {checklists.length === 0 ? (
+      {filteredChecklists.length === 0 ? (
         <View style={styles.empty}>
-          <Text variant="bodyLarge">Sin listas</Text>
+          <Text variant="bodyLarge" style={{ color: '#9CA3AF' }}>Sin listas guardadas</Text>
         </View>
       ) : (
         <FlashList
-          data={checklists.filter(isChecklistNote)}
+          data={filteredChecklists}
           renderItem={({ item }: { item: any }) => (
             <ChecklistCard 
               checklist={item} 

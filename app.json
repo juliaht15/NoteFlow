@@ -7,6 +7,7 @@
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "automatic",
     "scheme": "noteflow",
+    "newArchEnabled": true, 
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
@@ -35,19 +36,10 @@
       "typedRoutes": true
     },
     "extra": {
-      "router": {
-        "origin": false
-      },
       "eas": {
         "projectId": "54b70d35-3f44-4720-9b03-68f2fedb30df"
       }
     },
-    "owner": "juliaht15",
-    "runtimeVersion": {
-      "policy": "appVersion"
-    },
-    "updates": {
-      "url": "https://u.expo.dev/54b70d35-3f44-4720-9b03-68f2fedb30df"
-    }
+    "owner": "juliaht15"
   }
 }

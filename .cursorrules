@@ -2,33 +2,26 @@
 # Stack: React Native + Expo SDK 54 + TypeScript + Expo Router v6 + Zustand + FlashList + React Native Paper + Zod + Haptics
 
 ## Contexto del Proyecto
-- App de productividad con 3 tipos de contenido: Notas (texto), Ideas (tags + color), Listas (checklist con items)
-- Arquitectura: File-based routing con Expo Router
-- Estado global: Zustand + persistencia en AsyncStorage
-- Listas: FlashList de Shopify
-- UI: React Native Paper con tema claro/oscuro
-- Validación: Zod en formularios
-- Feedback táctil: expo-haptics
+- App de productividad con 3 tipos de contenido: Notas, Ideas, Listas.
+- Arquitectura: File-based routing con Expo Router.
+- Estado global: Zustand + persistencia en AsyncStorage.
 
-## Estructura de Carpetas
-- app/ → Rutas (index.tsx redirige a /(tabs)/notas)
-- components/items/ → NoteCard, IdeaCard, ChecklistCard
-- store/ → notesStore.ts (Zustand + persist)
-- types/ → index.ts (interfaces + type guards)
-- constants/ → theme.ts (tokens visuales)
+## Estructura de Carpetas (IMPORTANTE)
+- app/index.tsx → Redirige a /(tabs).
+- app/(tabs)/index.tsx → Pantalla principal de Notas.
+- app/(tabs)/checklists.tsx → Pantalla de Listas.
+- app/(tabs)/ideas.tsx → Pantalla de Ideas.
+- app/nueva-nota.tsx → Modal de creación (Nota, Lista, Idea).
+- store/notesStore.ts → Estado centralizado.
 
-## Reglas de Código
-1. TypeScript estricto: Nunca usar 'any' en lógica de negocio
-2. Expo Router: Usar router.push() para navegación
-3. FlashList: Usar {...({} as any)} para evitar errores de tipos
-4. Zustand: Exportar store con persist + AsyncStorage
-5. UI: Solo React Native Paper
-6. Formularios: Validar con Zod, mostrar errores con HelperText
-7. Haptics: ImpactFeedbackStyle.Light al eliminar, Success al guardar
-8. Estilos: StyleSheet.create, colores desde constants/theme.ts
-9. No usar: Class components, FlatList en listas largas
+## Reglas de Código Actualizadas
+1. TypeScript estricto: Evitar 'any'. Usar type guards (isNote, isIdeaNote, isChecklistNote).
+2. Rutas: Las pantallas dentro de (tabs) deben usar ../../ para importar desde store o types.
+3. FlashList: Mantener estimatedItemSize={100} y {...({} as any)} para compatibilidad.
+4. Zustand: Al añadir notas, usar la propiedad 'category' para que el store distribuya el objeto al array correcto.
+5. Fechas: Siempre validar/formatear updatedAt antes de renderizar (puede ser string tras persistencia).
+6. Haptics: Light al eliminar, Success al guardar.
+7. UI: Consistencia con constants/theme.ts. Bordes de 16px para cards.
 
 ## Restricciones
-- NO modificar tsconfig.json sin autorización
-- NO mezclar librerías UI
-- Todo el enrutamiento es file-based en app/
+- No usar rutas absolutas si fallan; priorizar rutas relativas basadas en la estructura real.
