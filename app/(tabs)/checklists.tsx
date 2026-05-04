@@ -16,7 +16,7 @@ export default function ChecklistsScreen() {
         data={lists}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
-          <Card style={styles.card}>
+          <Card style={styles.card} onPress={() => router.push(`/(tabs)/notas/${item.id}`)}>
             <Card.Title 
               title={item.title} 
               titleStyle={styles.cardTitle}
