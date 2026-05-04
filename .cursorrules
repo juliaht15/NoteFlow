@@ -1,11 +1,34 @@
-{
-  "project": "NoteFlow",
-  "stack": ["Expo", "TypeScript", "React Native Paper", "Zustand", "Shopify FlashList", "Zod"],
-  "rules": [
-    "Always use functional components and hooks.",
-    "Store logic must remain in 'store/notesStore.ts'.",
-    "For FlashList type errors (ts2322), use 'const List = FlashList as any'.",
-    "Ensure all new screens are added to 'app/(tabs)' or as modals in 'app/'.",
-    "Use Haptics for success/error feedback."
-  ]
-}
+# NoteFlow - Cursor AI Rules
+# Stack: React Native + Expo SDK 54 + TypeScript + Expo Router v6 + Zustand + FlashList + React Native Paper + Zod + Haptics
+
+## Contexto del Proyecto
+- App de productividad con 3 tipos de contenido: Notas (texto), Ideas (tags + color), Listas (checklist con items)
+- Arquitectura: File-based routing con Expo Router
+- Estado global: Zustand + persistencia en AsyncStorage
+- Listas: FlashList de Shopify
+- UI: React Native Paper con tema claro/oscuro
+- Validación: Zod en formularios
+- Feedback táctil: expo-haptics
+
+## Estructura de Carpetas
+- app/ → Rutas (index.tsx redirige a /(tabs)/notas)
+- components/items/ → NoteCard, IdeaCard, ChecklistCard
+- store/ → notesStore.ts (Zustand + persist)
+- types/ → index.ts (interfaces + type guards)
+- constants/ → theme.ts (tokens visuales)
+
+## Reglas de Código
+1. TypeScript estricto: Nunca usar 'any' en lógica de negocio
+2. Expo Router: Usar router.push() para navegación
+3. FlashList: Usar {...({} as any)} para evitar errores de tipos
+4. Zustand: Exportar store con persist + AsyncStorage
+5. UI: Solo React Native Paper
+6. Formularios: Validar con Zod, mostrar errores con HelperText
+7. Haptics: ImpactFeedbackStyle.Light al eliminar, Success al guardar
+8. Estilos: StyleSheet.create, colores desde constants/theme.ts
+9. No usar: Class components, FlatList en listas largas
+
+## Restricciones
+- NO modificar tsconfig.json sin autorización
+- NO mezclar librerías UI
+- Todo el enrutamiento es file-based en app/

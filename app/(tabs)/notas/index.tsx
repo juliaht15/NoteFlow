@@ -30,14 +30,18 @@ export default function NotasScreen() {
 
   return (
     <View style={styles.container}>
-      <Searchbar placeholder="Buscar..." onChangeText={setSearch} value={search} style={styles.search} />
+      <Searchbar 
+        placeholder="Buscar..." 
+        onChangeText={setSearch} 
+        value={search} 
+        style={styles.search} 
+      />
       
       {filteredNotes.length === 0 ? (
         <View style={styles.empty}>
           <Text variant="bodyLarge">Sin notas</Text>
         </View>
       ) : (
-        // @ts-ignore - FlashList types incompletos
         <FlashList
           data={filteredNotes}
           renderItem={({ item }: { item: any }) => (
@@ -50,10 +54,16 @@ export default function NotasScreen() {
           keyExtractor={(item: any) => item.id}
           estimatedItemSize={100}
           contentContainerStyle={styles.list}
+          {...({} as any)}
         />
       )}
       
-      <FAB icon="plus" onPress={() => router.push('/nueva-nota')} style={styles.fab} color="white" />
+      <FAB 
+        icon="plus" 
+        onPress={() => router.push('/nueva-nota')} 
+        style={styles.fab} 
+        color="white" 
+      />
     </View>
   );
 }

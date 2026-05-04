@@ -18,7 +18,6 @@ export default function IdeasScreen() {
           <Text variant="bodyLarge">Sin ideas</Text>
         </View>
       ) : (
-        // @ts-ignore - FlashList types incompletos
         <FlashList
           data={ideas.filter(isIdeaNote)}
           renderItem={({ item }: { item: any }) => (
@@ -31,9 +30,15 @@ export default function IdeasScreen() {
           keyExtractor={(item: any) => item.id}
           estimatedItemSize={100}
           contentContainerStyle={styles.list}
+          {...({} as any)}
         />
       )}
-      <FAB icon="plus" onPress={() => router.push('/nueva-nota')} style={styles.fab} color="white" />
+      <FAB 
+        icon="plus" 
+        onPress={() => router.push('/nueva-nota')} 
+        style={styles.fab} 
+        color="white" 
+      />
     </View>
   );
 }
