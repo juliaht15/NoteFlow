@@ -1,11 +1,13 @@
 import React from 'react';
 import { View, FlatList, StyleSheet } from 'react-native';
-import { Text, Card, Avatar } from 'react-native-paper';
+import { Text, Card, Avatar, IconButton, FAB } from 'react-native-paper';
+import { useRouter } from 'expo-router';
 import { useNotesStore } from '../../store/notesStore';
 import { Colors } from '../../constants/theme';
 
 export default function IdeasScreen() {
-  const { notes } = useNotesStore();
+  const router = useRouter();
+  const { notes, deleteNote } = useNotesStore();
   const ideas = notes.filter(n => n.category === 'idea');
 
   return (
@@ -13,39 +15,32 @@ export default function IdeasScreen() {
       <FlatList
         data={ideas}
         keyExtractor={(item) => item.id}
-        ListEmptyComponent={
-          <View style={styles.empty}>
-            <Text style={{ color: Colors.placeholder }}>No hay ideas guardadas.</Text>
-          </View>
-        }
         renderItem={({ item }) => (
-          <Card style={styles.card}>
+          <Card style={styles.card} onPress={() => router.push(`/(tabs)/notas/${item.id}`)}>
             <Card.Title
               title={item.title}
               titleStyle={styles.cardTitle}
               left={(props) => (
-                <Avatar.Icon 
-                  {...props} 
-                  icon="lightbulb-on-outline" 
-                  color={Colors.primary} 
-                  style={{ backgroundColor: Colors.secondary }} 
-                />
+                <Avatar.Icon {...props} icon="lightbulb-on-outline" color={Colors.primary} style={{ backgroundColor: Colors.secondary }} />
+              )}
+              right={(props) => (
+                <IconButton {...props} icon="trash-can-outline" iconColor={Colors.delete} onPress={() => deleteNote(item.id)} />
               )}
             />
             <Card.Content>
-              <Text style={styles.contentText}>{item.content}</Text>
+              <Text style={{ color: '#4B5563' }}>{item.content}</Text>
             </Card.Content>
           </Card>
         )}
       />
+      <FAB icon="plus" style={styles.fab} color="white" onPress={() => router.push('/nueva-nota')} />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: Colors.background, padding: 16 },
-  card: { marginBottom: 16, borderRadius: 16, elevation: 2 },
+  card: { marginBottom: 16, borderRadius: 16 },
   cardTitle: { fontWeight: 'bold' },
-  contentText: { color: '#4B5563', fontSize: 15 },
-  empty: { alignItems: 'center', marginTop: 50 }
+  fab: { position: 'absolute', margin: 16, right: 0, bottom: 0, backgroundColor: Colors.primary, borderRadius: 30 },
 });
