@@ -1,56 +1,57 @@
-import React from 'react';
-import { View, StyleSheet, FlatList } from 'react-native';
-import { Text, FAB, Card, IconButton, Avatar } from 'react-native-paper';
+import React, { useState } from 'react';
+import { View, StyleSheet, Appearance } from 'react-native';
+import { Searchbar, FAB, Text, Card, IconButton } from 'react-native-paper';
+// CORRECCIÓN: Ajustamos la ruta según tu estructura de carpetas
+import { useNotesStore } from '../../../store/notesStore'; 
+import { FlashList } from '@shopify/flash-list';
 import { useRouter } from 'expo-router';
-import { useNotesStore } from '../../../store/notesStore';
-import { Colors } from '../../../constants/theme';
+import * as Haptics from 'expo-haptics';
+
+const List = FlashList as any;
 
 export default function NotasScreen() {
-  const router = useRouter();
+  const [searchQuery, setSearchQuery] = useState('');
   const { notes, deleteNote } = useNotesStore();
+  const router = useRouter();
 
-  const soloNotas = notes.filter(n => n.category === 'nota');
+  const themeColors = {
+    background: Appearance.getColorScheme() === 'dark' ? '#121212' : '#f5f5f5',
+    surface: Appearance.getColorScheme() === 'dark' ? '#1e1e1e' : '#ffffff',
+    text: Appearance.getColorScheme() === 'dark' ? '#ffffff' : '#000000',
+    primary: '#2196F3'
+  };
+
+  // CORRECCIÓN: Añadimos tipo 'any' o el tipo de tu interfaz Note al parámetro
+  const filteredNotes = notes.filter((note: any) => 
+    note.title.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const handleDelete = (id: string) => {
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    deleteNote(id);
+  };
 
   return (
-    <View style={styles.container}>
-      <FlatList
-        data={soloNotas}
-        keyExtractor={(item) => item.id}
-        ListEmptyComponent={
-          <View style={styles.empty}>
-            <Text style={{ color: Colors.placeholder }}>No tienes notas personales aún.</Text>
-          </View>
-        }
-        renderItem={({ item }) => (
-          <Card 
-            style={styles.card} 
-            onPress={() => router.push(`/(tabs)/notas/${item.id}`)}
-          >
+    <View style={[styles.container, { backgroundColor: themeColors.background }]}>
+      <Searchbar
+        placeholder="Buscar..."
+        onChangeText={setSearchQuery}
+        value={searchQuery}
+        style={styles.searchBar}
+      />
+
+      <List
+        data={filteredNotes}
+        estimatedItemSize={100}
+        renderItem={({ item }: { item: any }) => (
+          <Card style={[styles.card, { backgroundColor: themeColors.surface }]}>
             <Card.Title
               title={item.title}
-              titleStyle={styles.cardTitle}
-              left={(props) => (
-                <Avatar.Icon 
-                  {...props} 
-                  icon="note-text-outline" 
-                  color={Colors.primary} 
-                  style={{ backgroundColor: Colors.secondary }} 
-                />
-              )}
+              titleStyle={{ color: themeColors.text }}
               right={(props) => (
-                <IconButton 
-                  {...props} 
-                  icon="trash-can-outline" 
-                  iconColor={Colors.delete} 
-                  onPress={() => deleteNote(item.id)} 
-                />
+                <IconButton {...props} icon="delete-outline" iconColor="red" onPress={() => handleDelete(item.id)} />
               )}
             />
-            <Card.Content>
-              <Text numberOfLines={2} style={styles.content}>
-                {item.content}
-              </Text>
-            </Card.Content>
           </Card>
         )}
       />
@@ -58,7 +59,6 @@ export default function NotasScreen() {
       <FAB
         icon="plus"
         style={styles.fab}
-        color="white"
         onPress={() => router.push('/nueva-nota')}
       />
     </View>
@@ -66,34 +66,8 @@ export default function NotasScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { 
-    flex: 1, 
-    backgroundColor: Colors.background, 
-    padding: 16 
-  },
-  card: { 
-    marginBottom: 16, 
-    borderRadius: 16, 
-    backgroundColor: Colors.surface, 
-    elevation: 2 
-  },
-  cardTitle: { 
-    fontWeight: 'bold' 
-  },
-  content: { 
-    color: '#4A5568', 
-    fontSize: 14 
-  },
-  empty: { 
-    alignItems: 'center', 
-    marginTop: 50 
-  },
-  fab: { 
-    position: 'absolute', 
-    margin: 16, 
-    right: 0, 
-    bottom: 0, 
-    backgroundColor: Colors.primary, 
-    borderRadius: 30 
-  },
+  container: { flex: 1 },
+  searchBar: { margin: 16, borderRadius: 10 },
+  card: { marginHorizontal: 16, marginBottom: 12, borderRadius: 12 },
+  fab: { position: 'absolute', margin: 20, right: 0, bottom: 0, backgroundColor: '#2196F3' }
 });
