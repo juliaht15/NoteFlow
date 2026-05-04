@@ -1,73 +1,59 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, Appearance } from 'react-native';
-import { Searchbar, FAB, Text, Card, IconButton } from 'react-native-paper';
-// CORRECCIÓN: Ajustamos la ruta según tu estructura de carpetas
+import { View, StyleSheet } from 'react-native';
+import { Searchbar, FAB, Card, Text, IconButton } from 'react-native-paper';
 import { useNotesStore } from '../../../store/notesStore'; 
 import { FlashList } from '@shopify/flash-list';
 import { useRouter } from 'expo-router';
-import * as Haptics from 'expo-haptics';
 
-const List = FlashList as any;
+// Esto soluciona el error ts(2322) de tu imagen ssss_3.PNG
+const TypedFlashList = FlashList as any;
 
-export default function NotasScreen() {
+export default function ChecklistsScreen() {
   const [searchQuery, setSearchQuery] = useState('');
   const { notes, deleteNote } = useNotesStore();
   const router = useRouter();
 
-  const themeColors = {
-    background: Appearance.getColorScheme() === 'dark' ? '#121212' : '#f5f5f5',
-    surface: Appearance.getColorScheme() === 'dark' ? '#1e1e1e' : '#ffffff',
-    text: Appearance.getColorScheme() === 'dark' ? '#ffffff' : '#000000',
-    primary: '#2196F3'
-  };
-
-  // CORRECCIÓN: Añadimos tipo 'any' o el tipo de tu interfaz Note al parámetro
-  const filteredNotes = notes.filter((note: any) => 
-    note.title.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredData = notes.filter((n: any) => 
+    n.category === 'lista' && n.title.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const handleDelete = (id: string) => {
-    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    deleteNote(id);
-  };
-
   return (
-    <View style={[styles.container, { backgroundColor: themeColors.background }]}>
+    <View style={styles.container}>
       <Searchbar
-        placeholder="Buscar..."
+        placeholder="Buscar listas..."
         onChangeText={setSearchQuery}
         value={searchQuery}
-        style={styles.searchBar}
+        style={styles.search}
       />
 
-      <List
-        data={filteredNotes}
+      <TypedFlashList
+        data={filteredData}
         estimatedItemSize={100}
-        renderItem={({ item }: { item: any }) => (
-          <Card style={[styles.card, { backgroundColor: themeColors.surface }]}>
+        contentContainerStyle={{ padding: 16 }}
+        renderItem={({ item }: any) => (
+          <Card style={styles.card}>
             <Card.Title
               title={item.title}
-              titleStyle={{ color: themeColors.text }}
+              left={(props) => <IconButton {...props} icon="format-list-checks" iconColor="#2196F3" />}
               right={(props) => (
-                <IconButton {...props} icon="delete-outline" iconColor="red" onPress={() => handleDelete(item.id)} />
+                <IconButton {...props} icon="delete-outline" iconColor="#d32f2f" onPress={() => deleteNote(item.id)} />
               )}
             />
+            <Card.Content>
+              <Text variant="bodySmall">{item.content || "Sin elementos"}</Text>
+            </Card.Content>
           </Card>
         )}
       />
 
-      <FAB
-        icon="plus"
-        style={styles.fab}
-        onPress={() => router.push('/nueva-nota')}
-      />
+      <FAB icon="plus" style={styles.fab} onPress={() => router.push('/nueva-nota')} color="white" />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
-  searchBar: { margin: 16, borderRadius: 10 },
-  card: { marginHorizontal: 16, marginBottom: 12, borderRadius: 12 },
-  fab: { position: 'absolute', margin: 20, right: 0, bottom: 0, backgroundColor: '#2196F3' }
+  container: { flex: 1, backgroundColor: '#f5f5f5' },
+  search: { margin: 16, borderRadius: 12, backgroundColor: '#fff' },
+  card: { marginBottom: 12, borderRadius: 16, backgroundColor: '#fff' },
+  fab: { position: 'absolute', margin: 16, right: 0, bottom: 0, backgroundColor: '#2196F3', borderRadius: 28 }
 });

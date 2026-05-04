@@ -2,8 +2,7 @@ import React, { useState } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { TextInput, SegmentedButtons, Button } from 'react-native-paper';
 import { useNotesStore } from '../store/notesStore';
-import { useRouter } from 'expo-router';
-import * as Haptics from 'expo-haptics';
+import { useRouter, Stack } from 'expo-router';
 
 export default function NuevaNotaModal() {
   const [title, setTitle] = useState('');
@@ -14,22 +13,26 @@ export default function NuevaNotaModal() {
 
   const handleSave = () => {
     if (!title) return;
-
     addNote({
       id: Date.now().toString(),
       title,
       content,
-      category: category as 'nota' | 'lista' | 'idea',
+      category: category as any,
       completed: false
     });
-
-    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     router.back();
   };
 
   return (
     <View style={styles.container}>
-      {/* ORDEN SOLICITADO: Nota, Lista e Idea */}
+      {/* ESTO ACTIVA EL BOTÓN DE SALIR EN LA CABECERA */}
+      <Stack.Screen options={{ 
+        headerLeft: () => (
+          <Button onPress={() => router.back()}>Salir</Button>
+        ),
+        title: 'Crear'
+      }} />
+
       <SegmentedButtons
         value={category}
         onValueChange={setCategory}
@@ -42,9 +45,9 @@ export default function NuevaNotaModal() {
       />
 
       <TextInput label="Título" value={title} onChangeText={setTitle} mode="outlined" style={styles.input} />
-      <TextInput label="Contenido" value={content} onChangeText={setContent} mode="outlined" multiline numberOfLines={5} style={styles.input} />
+      <TextInput label="Contenido (o elementos de lista)" value={content} onChangeText={setContent} mode="outlined" multiline numberOfLines={5} style={styles.input} />
 
-      <Button mode="contained" onPress={handleSave} style={styles.button}>
+      <Button mode="contained" onPress={handleSave} style={styles.saveButton}>
         Guardar
       </Button>
     </View>
@@ -52,8 +55,8 @@ export default function NuevaNotaModal() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20, backgroundColor: '#f5f5f5' },
+  container: { flex: 1, padding: 20, backgroundColor: '#fff' },
   segment: { marginBottom: 20 },
   input: { marginBottom: 15 },
-  button: { marginTop: 10, backgroundColor: '#2196F3' }
+  saveButton: { marginTop: 10, backgroundColor: '#2196F3' }
 });
