@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, ScrollView } from 'react-native';
-import { Text, IconButton, Chip } from 'react-native-paper';
+import { Text, IconButton, Chip, TextInput } from 'react-native-paper';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useNotesStore } from '../../store/notesStore';
 import { AnyNote, isNote, isChecklistNote, isIdeaNote } from '../../types';
@@ -9,55 +9,84 @@ import { Colors } from '../../constants/theme';
 export default function NoteDetailScreen() {
   const { id } = useLocalSearchParams();
   const router = useRouter();
-  const { notes, checklists, ideas } = useNotesStore();
+  const { notes, checklists, ideas, updateNote } = useNotesStore();
 
-  // Combinamos todos los arrays para buscar la nota por ID
-  const allEntries = [...notes, ...checklists, ...ideas];
-  const note = allEntries.find((n: AnyNote) => n.id === id);
+  const foundNote = 
+    notes.find((n) => n.id === id) || 
+    checklists.find((c) => c.id === id) || 
+    ideas.find((i) => i.id === id);
 
-  if (!note) {
+  // Estados locales
+  const [title, setTitle] = useState(foundNote?.title || '');
+  const [content, setContent] = useState('');
+
+  // Sincronizar contenido si es una nota simple al cargar
+  useEffect(() => {
+    if (foundNote && isNote(foundNote)) {
+      setContent(foundNote.content);
+    }
+  }, [foundNote]);
+
+  // Guardado automático (Debounce)
+  useEffect(() => {
+    if (foundNote) {
+      const timeoutId = setTimeout(() => {
+        updateNote(id as string, { title, content });
+      }, 500);
+      return () => clearTimeout(timeoutId);
+    }
+  }, [title, content]);
+
+  if (!foundNote) {
     return (
       <View style={styles.container}>
-        <Text style={styles.errorText}>Nota no encontrada</Text>
         <IconButton icon="arrow-left" onPress={() => router.back()} />
+        <View style={styles.centered}><Text>Nota no encontrada</Text></View>
       </View>
     );
   }
 
+  // Aserción de tipo segura para TS
+  const note = foundNote as AnyNote;
+
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView style={styles.container} keyboardShouldPersistTaps="handled">
       <View style={styles.header}>
         <IconButton icon="arrow-left" onPress={() => router.back()} />
-        <Text variant="headlineMedium" style={styles.title}>{note.title}</Text>
+        <TextInput
+          value={title}
+          onChangeText={setTitle}
+          mode="flat"
+          style={styles.titleInput}
+          underlineColor="transparent"
+        />
       </View>
 
       <View style={styles.content}>
-        {/* Renderizado para Notas Simples */}
         {isNote(note) && (
-          <Text variant="bodyLarge">{note.content}</Text>
+          <TextInput
+            value={content}
+            onChangeText={setContent}
+            multiline
+            mode="flat"
+            style={styles.contentInput}
+            underlineColor="transparent"
+          />
         )}
 
-        {/* Renderizado para Checklists */}
         {isChecklistNote(note) && note.items.map((item) => (
           <View key={item.id} style={styles.checkItem}>
-            <IconButton 
-              icon={item.isCompleted ? "check-circle" : "circle-outline"} 
-              iconColor={item.isCompleted ? Colors?.primary : '#757575'}
-            />
-            <Text style={[
-              styles.checkText,
-              { textDecorationLine: item.isCompleted ? 'line-through' : 'none' }
-            ]}>
+            <IconButton icon={item.isCompleted ? "check-circle" : "circle-outline"} />
+            <Text style={{ textDecorationLine: item.isCompleted ? 'line-through' : 'none' }}>
               {item.text}
             </Text>
           </View>
         ))}
 
-        {/* Renderizado para Ideas/Tags */}
         {isIdeaNote(note) && (
           <View style={styles.tagContainer}>
             {note.tags.map((tag, index) => (
-              <Chip key={index} style={styles.tag}>{tag}</Chip>
+              <Chip key={index} icon="tag" style={styles.tag}>{tag}</Chip>
             ))}
           </View>
         )}
@@ -67,44 +96,13 @@ export default function NoteDetailScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { 
-    flex: 1, 
-    backgroundColor: '#fff' 
-  },
-  header: { 
-    flexDirection: 'row', 
-    alignItems: 'center', 
-    padding: 8 
-  },
-  title: { 
-    flex: 1, 
-    fontWeight: 'bold',
-    marginLeft: 8
-  },
-  content: { 
-    padding: 20 
-  },
-  checkItem: { 
-    flexDirection: 'row', 
-    alignItems: 'center',
-    marginBottom: 8
-  },
-  checkText: {
-    fontSize: 16,
-    color: '#333'
-  },
-  tagContainer: { 
-    flexDirection: 'row', 
-    flexWrap: 'wrap', 
-    gap: 8,
-    marginTop: 10
-  },
-  tag: { 
-    backgroundColor: '#f0f0f0' 
-  },
-  errorText: {
-    textAlign: 'center',
-    marginTop: 50,
-    fontSize: 18
-  }
+  container: { flex: 1, backgroundColor: '#fff' },
+  centered: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+  header: { flexDirection: 'row', alignItems: 'center', paddingTop: 40, borderBottomWidth: 1, borderBottomColor: '#eee' },
+  titleInput: { flex: 1, fontSize: 22, fontWeight: 'bold', backgroundColor: 'transparent' },
+  content: { padding: 20 },
+  contentInput: { fontSize: 16, backgroundColor: 'transparent', minHeight: 200 },
+  checkItem: { flexDirection: 'row', alignItems: 'center' },
+  tagContainer: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
+  tag: { backgroundColor: '#e3f2fd' }
 });

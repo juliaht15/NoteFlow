@@ -1,69 +1,40 @@
-import React from 'react';
-import { View, StyleSheet, FlatList } from 'react-native';
-import { Text, FAB, Searchbar } from 'react-native-paper';
-import { useRouter } from 'expo-router';
-import { useNotesStore } from '../../store/notesStore';
-import { Note } from '../../types';
-import NoteCard from '../../components/items/NoteCard';
-import { Colors } from '../../constants/theme';
-
-export default function NotasScreen() {
-  const router = useRouter();
-  const [searchQuery, setSearchQuery] = React.useState('');
-  const { notes, deleteNote } = useNotesStore();
-
-  const filteredNotes = notes.filter((n: Note) => 
-    n.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    (n.content?.toLowerCase() || '').includes(searchQuery.toLowerCase())
-  );
-
-  return (
-    <View style={styles.container}>
-      <Searchbar
-        placeholder="Buscar notas..."
-        onChangeText={setSearchQuery}
-        value={searchQuery}
-        style={styles.search}
-      />
-
-      <FlatList
-        data={filteredNotes}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <NoteCard
-            note={item}
-            onPress={() => router.push(`/(tabs)/${item.id}` as any)}
-            onDelete={() => deleteNote(item.id, 'nota')}
-          />
-        )}
-        contentContainerStyle={styles.list}
-        ListEmptyComponent={
-          <View style={styles.empty}>
-            <Text variant="bodyMedium">No hay notas guardadas</Text>
-          </View>
-        }
-      />
-
-      <FAB
-        icon="plus"
-        style={styles.fab}
-        color="white"
-        onPress={() => router.push('/nueva-nota')}
-      />
-    </View>
-  );
+export interface Note {
+  id: string;
+  title: string;
+  content: string;
+  type: 'nota'; // Forzamos el literal para el discriminante
+  createdAt: Date;
+  updatedAt: Date;
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: Colors?.background || '#F8F9FA' },
-  search: { margin: 16, borderRadius: 12, backgroundColor: '#FFFFFF' },
-  list: { padding: 16, paddingBottom: 80 },
-  empty: { flex: 1, justifyContent: 'center', alignItems: 'center', marginTop: 50 },
-  fab: { 
-    position: 'absolute', 
-    right: 16, 
-    bottom: 16, 
-    backgroundColor: Colors?.primary || '#3A86FF', 
-    borderRadius: 28 
-  },
-});
+export interface ChecklistItem {
+  id: string;
+  text: string;
+  isCompleted: boolean;
+}
+
+export interface ChecklistNote {
+  id: string;
+  title: string;
+  items: ChecklistItem[];
+  type: 'lista';
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface IdeaNote {
+  id: string;
+  title: string;
+  content: string;
+  tags: string[];
+  type: 'idea';
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export type AnyNote = Note | ChecklistNote | IdeaNote;
+
+// Type Guards para que TypeScript no se queje en el renderizado
+export const isNote = (n: AnyNote): n is Note => n.type === 'nota';
+export const isChecklistNote = (n: AnyNote): n is ChecklistNote => n.type === 'lista';
+export const isIdeaNote = (n: AnyNote): n is IdeaNote => n.type === 'idea';

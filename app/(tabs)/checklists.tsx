@@ -1,43 +1,57 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, StyleSheet } from 'react-native';
-import { Text, FAB } from 'react-native-paper';
-import { FlashList } from '@shopify/flash-list';
-// CORRECCIÓN: Subimos 2 niveles, no 3 (app/(tabs) -> store)
+import { Text, FAB, Searchbar } from 'react-native-paper';
+import { FlashList, FlashListProps } from '@shopify/flash-list';
 import { useNotesStore } from '../../store/notesStore';
-import { isChecklistNote } from '../../types';
+import { ChecklistNote } from '../../types';
 import ChecklistCard from '../../components/items/ChecklistCard';
 import { useRouter } from 'expo-router';
+import { Colors } from '../../constants/theme';
 
 export default function ChecklistsScreen() {
-  // CORRECCIÓN: Extraemos 'notes' en lugar de 'checklists' inexistente
-  const { notes, deleteNote } = useNotesStore();
   const router = useRouter();
+  const [searchQuery, setSearchQuery] = useState('');
+  const { checklists, deleteNote } = useNotesStore();
 
-  // Filtramos las notas que son específicamente de tipo lista
-  const filteredChecklists = notes.filter(n => n.category === 'lista');
+  const filteredChecklists = checklists.filter((item) =>
+    item.title.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   return (
     <View style={styles.container}>
+      <Searchbar
+        placeholder="Buscar listas..."
+        onChangeText={setSearchQuery}
+        value={searchQuery}
+        style={styles.search}
+      />
+
       {filteredChecklists.length === 0 ? (
         <View style={styles.empty}>
-          <Text variant="bodyLarge" style={{ color: '#9CA3AF' }}>Sin listas guardadas</Text>
+          <Text variant="bodyLarge" style={{ color: '#9CA3AF' }}>
+            {searchQuery ? "No hay coincidencias" : "Sin listas guardadas"}
+          </Text>
         </View>
       ) : (
-        <FlashList
-          data={filteredChecklists}
-          renderItem={({ item }: { item: any }) => (
-            <ChecklistCard 
-              checklist={item} 
-              onPress={() => router.push(`/notas/${item.id}`)} 
-              onDelete={() => deleteNote(item.id, 'checklist')} 
-            />
-          )}
-          keyExtractor={(item: any) => item.id}
-          estimatedItemSize={100}
-          contentContainerStyle={styles.list}
-          {...({} as any)}
-        />
+        <View style={{ flex: 1 }}>
+          <FlashList
+            {...( {
+              data: filteredChecklists,
+              renderItem: ({ item }: { item: ChecklistNote }) => (
+                <ChecklistCard 
+                  checklist={item} 
+                  onPress={() => router.push(`/(tabs)/${item.id}`)} 
+                  onDelete={() => deleteNote(item.id, 'lista')} 
+                />
+              ),
+              keyExtractor: (item: ChecklistNote) => item.id,
+              estimatedItemSize: 100,
+              contentContainerStyle: styles.list,
+            } as FlashListProps<ChecklistNote> )}
+          />
+        </View>
       )}
+      
       <FAB 
         icon="plus" 
         onPress={() => router.push('/nueva-nota')} 
@@ -49,8 +63,9 @@ export default function ChecklistsScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#F8F9FA' },
-  list: { padding: 16, paddingBottom: 80 },
+  container: { flex: 1, backgroundColor: Colors?.background || '#F8F9FA' },
+  search: { margin: 16, borderRadius: 12, backgroundColor: '#FFFFFF', elevation: 2 },
+  list: { paddingHorizontal: 16, paddingBottom: 100 },
   empty: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  fab: { position: 'absolute', right: 16, bottom: 16, backgroundColor: '#3A86FF', borderRadius: 28 },
+  fab: { position: 'absolute', right: 16, bottom: 16, backgroundColor: Colors?.primary || '#3A86FF', borderRadius: 28 },
 });
