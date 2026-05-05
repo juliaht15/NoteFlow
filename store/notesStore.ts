@@ -8,7 +8,8 @@ interface NotesStore {
   checklists: ChecklistNote[];
   ideas: IdeaNote[];
   addNote: (item: AnyNote) => void;
-  deleteNote: (id: string, type: 'nota' | 'lista' | 'idea') => void;
+  // Simplificado: solo pedimos el ID para borrar en cualquier lista
+  deleteNote: (id: string) => void; 
   updateNote: (id: string, data: Partial<AnyNote>) => void;
   toggleChecklistItem: (checklistId: string, itemId: string) => void;
 }
@@ -30,16 +31,11 @@ export const useNotesStore = create<NotesStore>()(
         }
       }),
 
-      deleteNote: (id, type) => set((state) => ({
-        notes: type === 'nota' 
-          ? state.notes.filter(n => n.id !== id) 
-          : state.notes,
-        checklists: type === 'lista' 
-          ? state.checklists.filter(c => c.id !== id) 
-          : state.checklists,
-        ideas: type === 'idea' 
-          ? state.ideas.filter(i => i.id !== id) 
-          : state.ideas,
+      // Ahora busca el ID en todas las categorías, así nunca falla
+      deleteNote: (id: string) => set((state) => ({
+        notes: state.notes.filter((n) => n.id !== id),
+        checklists: state.checklists.filter((c) => c.id !== id),
+        ideas: state.ideas.filter((i) => i.id !== id),
       })),
 
       updateNote: (id, data) => set((state) => ({

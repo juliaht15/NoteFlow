@@ -11,11 +11,15 @@ interface ChecklistCardProps {
 }
 
 export default function ChecklistCard({ checklist, onPress, onDelete }: ChecklistCardProps) {
-  // Garantizamos que items sea un array para evitar errores de renderizado
   const items = Array.isArray(checklist.items) ? checklist.items : [];
   const completed = items.filter(i => i.isCompleted).length;
   const total = items.length;
   const progress = total > 0 ? completed / total : 0;
+
+  const formatDate = (date: any) => {
+    const d = new Date(date);
+    return isNaN(d.getTime()) ? 'Reciente' : d.toLocaleDateString('es-ES');
+  };
 
   return (
     <Card mode="elevated" style={styles.card} onPress={onPress}>
@@ -25,7 +29,6 @@ export default function ChecklistCard({ checklist, onPress, onDelete }: Checklis
             <Text variant="titleMedium" numberOfLines={1} style={styles.title}>
               {checklist.title || 'Lista sin título'}
             </Text>
-            {/* Si la lista está vacía pero tiene descripción, la mostramos */}
             {total === 0 && checklist.content && (
               <Text variant="bodySmall" numberOfLines={1} style={styles.preview}>
                 {checklist.content}
@@ -41,7 +44,6 @@ export default function ChecklistCard({ checklist, onPress, onDelete }: Checklis
           />
         </View>
 
-        {/* Indicador de progreso visual */}
         {total > 0 ? (
           <View style={styles.progressContainer}>
             <View style={styles.progressRow}>
@@ -54,15 +56,16 @@ export default function ChecklistCard({ checklist, onPress, onDelete }: Checklis
                 {completed}/{total}
               </Text>
             </View>
-            <Text variant="labelSmall" style={styles.percentage}>
-              {Math.round(progress * 100)}% completado
-            </Text>
           </View>
         ) : (
           <Text variant="labelSmall" style={styles.emptyText}>
             No hay elementos en la lista
           </Text>
         )}
+
+        <Text variant="labelSmall" style={styles.date}>
+          {formatDate(checklist.updatedAt)}
+        </Text>
       </Card.Content>
     </Card>
   );
@@ -113,13 +116,15 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     minWidth: 30
   },
-  percentage: {
-    color: Colors.textSecondary,
-    marginTop: 4,
-    fontSize: 10
-  },
   emptyText: {
     color: Colors.textSecondary,
-    fontStyle: 'italic'
+    fontStyle: 'italic',
+    marginTop: 4
+  },
+  date: { 
+    color: Colors.textSecondary, 
+    marginTop: 12, 
+    textAlign: 'right', 
+    fontSize: 10 
   }
 });

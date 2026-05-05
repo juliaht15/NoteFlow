@@ -30,19 +30,26 @@ export default function NoteDetailScreen() {
     }
   }, [foundNote?.id]);
 
-  // Guardado automático con Debounce
   useEffect(() => {
-    if (!foundNote) return;
+  if (!foundNote) return;
 
-    const timeoutId = setTimeout(() => {
-      // Solo actualizamos si hay cambios reales para evitar re-renders infinitos
-      if (title !== foundNote.title || (isNote(foundNote) && content !== foundNote.content)) {
+  const timeoutId = setTimeout(() => {
+    // Si es una nota o idea, actualizamos título y contenido de texto
+    if (isNote(foundNote) || isIdeaNote(foundNote)) {
+      if (title !== foundNote.title || content !== (foundNote as any).content) {
         updateNote(id as string, { title, content });
       }
-    }, 1000);
+    } 
+    // Si es una lista, solo actualizamos el título (los items se guardan al hacer click)
+    else if (isChecklistNote(foundNote)) {
+      if (title !== foundNote.title) {
+        updateNote(id as string, { title });
+      }
+    }
+  }, 1000);
 
-    return () => clearTimeout(timeoutId);
-  }, [title, content]);
+  return () => clearTimeout(timeoutId);
+}, [title, content]);
 
   if (!foundNote) {
     return (
