@@ -1,12 +1,13 @@
 export interface BaseNote {
   id: string;
   title: string;
-  category: 'nota' | 'lista' | 'idea'; // Añadido para consistencia con el Store
+  category: 'nota' | 'lista' | 'idea';
   createdAt: Date;
   updatedAt: Date;
 }
 
 export interface Note extends BaseNote {
+  category: 'nota'; // Forzamos el literal para mejor discriminación
   content: string;
 }
 
@@ -17,27 +18,33 @@ export interface ChecklistItem {
 }
 
 export interface ChecklistNote extends BaseNote {
-  content?: string; // Añadido opcional por si se guarda texto plano
+  category: 'lista'; // Forzamos el literal
+  content?: string;
   items: ChecklistItem[];
 }
 
 export interface IdeaNote extends BaseNote {
-  content?: string; // Añadido opcional
+  category: 'idea'; // Forzamos el literal
+  content?: string;
   tags: string[];
   color: string;
 }
 
 export type AnyNote = Note | ChecklistNote | IdeaNote;
 
-// Funciones de validación mejoradas
+/**
+ * Funciones de validación (Type Guards)
+ * Se basan primero en la categoría y luego en la propiedad única para asegurar el tipo.
+ */
+
 export function isNote(note: AnyNote): note is Note {
-  return note.category === 'nota' || 'content' in note;
+  return note.category === 'nota';
 }
 
 export function isChecklistNote(note: AnyNote): note is ChecklistNote {
-  return note.category === 'lista' || 'items' in note;
+  return note.category === 'lista' && Array.isArray((note as ChecklistNote).items);
 }
 
 export function isIdeaNote(note: AnyNote): note is IdeaNote {
-  return note.category === 'idea' || 'tags' in note;
+  return note.category === 'idea' && Array.isArray((note as IdeaNote).tags);
 }

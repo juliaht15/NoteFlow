@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, ScrollView } from 'react-native';
-import { Text, IconButton, Chip, TextInput } from 'react-native-paper';
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { View, StyleSheet, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
+import { Text, IconButton, Chip, TextInput, Checkbox } from 'react-native-paper';
+import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
 import { useNotesStore } from '../../store/notesStore';
 import { AnyNote, isNote, isChecklistNote, isIdeaNote } from '../../types';
-import { Colors } from '../../constants/theme';
+import { Colors, Spacing } from '../../constants/theme';
 
 export default function NoteDetailScreen() {
   const { id } = useLocalSearchParams();
   const router = useRouter();
-  const { notes, checklists, ideas, updateNote } = useNotesStore();
+  const { notes, checklists, ideas, updateNote, toggleChecklistItem } = useNotesStore();
 
   const foundNote = 
     notes.find((n) => n.id === id) || 
@@ -20,89 +20,161 @@ export default function NoteDetailScreen() {
   const [title, setTitle] = useState(foundNote?.title || '');
   const [content, setContent] = useState('');
 
-  // Sincronizar contenido si es una nota simple al cargar
-  useEffect(() => {
-    if (foundNote && isNote(foundNote)) {
-      setContent(foundNote.content);
-    }
-  }, [foundNote]);
-
-  // Guardado automático (Debounce)
+  // Sincronizar estados locales al cargar la nota
   useEffect(() => {
     if (foundNote) {
-      const timeoutId = setTimeout(() => {
-        updateNote(id as string, { title, content });
-      }, 500);
-      return () => clearTimeout(timeoutId);
+      setTitle(foundNote.title);
+      if (isNote(foundNote) || isIdeaNote(foundNote)) {
+        setContent(foundNote.content || '');
+      }
     }
+  }, [foundNote?.id]);
+
+  // Guardado automático con Debounce
+  useEffect(() => {
+    if (!foundNote) return;
+
+    const timeoutId = setTimeout(() => {
+      // Solo actualizamos si hay cambios reales para evitar re-renders infinitos
+      if (title !== foundNote.title || (isNote(foundNote) && content !== foundNote.content)) {
+        updateNote(id as string, { title, content });
+      }
+    }, 1000);
+
+    return () => clearTimeout(timeoutId);
   }, [title, content]);
 
   if (!foundNote) {
     return (
-      <View style={styles.container}>
-        <IconButton icon="arrow-left" onPress={() => router.back()} />
-        <View style={styles.centered}><Text>Nota no encontrada</Text></View>
+      <View style={styles.centered}>
+        <Text variant="headlineSmall">Nota no encontrada</Text>
+        <IconButton icon="home" mode="contained" onPress={() => router.replace('/(tabs)')} />
       </View>
     );
   }
 
-  // Aserción de tipo segura para TS
   const note = foundNote as AnyNote;
 
   return (
-    <ScrollView style={styles.container} keyboardShouldPersistTaps="handled">
+    <KeyboardAvoidingView 
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined} 
+      style={styles.container}
+    >
+      <Stack.Screen options={{ title: '', headerShown: false }} />
+      
       <View style={styles.header}>
-        <IconButton icon="arrow-left" onPress={() => router.back()} />
+        <IconButton icon="arrow-left" onPress={() => router.back()} iconColor={Colors.text} />
         <TextInput
           value={title}
           onChangeText={setTitle}
           mode="flat"
+          placeholder="Sin título"
           style={styles.titleInput}
           underlineColor="transparent"
+          activeUnderlineColor="transparent"
         />
       </View>
 
-      <View style={styles.content}>
-        {isNote(note) && (
+      <ScrollView contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
+        {/* Renderizado para Notas e Ideas */}
+        {(isNote(note) || isIdeaNote(note)) && (
           <TextInput
             value={content}
             onChangeText={setContent}
             multiline
+            placeholder="Empieza a escribir..."
             mode="flat"
             style={styles.contentInput}
             underlineColor="transparent"
+            activeUnderlineColor="transparent"
           />
         )}
 
-        {isChecklistNote(note) && note.items.map((item) => (
-          <View key={item.id} style={styles.checkItem}>
-            <IconButton icon={item.isCompleted ? "check-circle" : "circle-outline"} />
-            <Text style={{ textDecorationLine: item.isCompleted ? 'line-through' : 'none' }}>
-              {item.text}
-            </Text>
-          </View>
-        ))}
-
-        {isIdeaNote(note) && (
-          <View style={styles.tagContainer}>
-            {note.tags.map((tag, index) => (
-              <Chip key={index} icon="tag" style={styles.tag}>{tag}</Chip>
+        {/* Renderizado para Listas de Tareas */}
+        {isChecklistNote(note) && (
+          <View style={styles.checklistContainer}>
+            {note.items.map((item) => (
+              <View key={item.id} style={styles.checkItem}>
+                <Checkbox
+                  status={item.isCompleted ? 'checked' : 'unchecked'}
+                  onPress={() => toggleChecklistItem(note.id, item.id)}
+                  color={Colors.primary}
+                />
+                <Text 
+                  style={[
+                    styles.checkText, 
+                    item.isCompleted && styles.completedText
+                  ]}
+                  onPress={() => toggleChecklistItem(note.id, item.id)}
+                >
+                  {item.text}
+                </Text>
+              </View>
             ))}
           </View>
         )}
-      </View>
-    </ScrollView>
+
+        {/* Etiquetas para Ideas */}
+        {isIdeaNote(note) && note.tags.length > 0 && (
+          <View style={styles.tagContainer}>
+            {note.tags.map((tag, index) => (
+              <Chip key={index} icon="tag-outline" style={styles.tag} textStyle={styles.tagText}>
+                {tag}
+              </Chip>
+            ))}
+          </View>
+        )}
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#fff' },
-  centered: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  header: { flexDirection: 'row', alignItems: 'center', paddingTop: 40, borderBottomWidth: 1, borderBottomColor: '#eee' },
-  titleInput: { flex: 1, fontSize: 22, fontWeight: 'bold', backgroundColor: 'transparent' },
-  content: { padding: 20 },
-  contentInput: { fontSize: 16, backgroundColor: 'transparent', minHeight: 200 },
-  checkItem: { flexDirection: 'row', alignItems: 'center' },
-  tagContainer: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
-  tag: { backgroundColor: '#e3f2fd' }
+  container: { flex: 1, backgroundColor: Colors.surface },
+  centered: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: Colors.background },
+  header: { 
+    flexDirection: 'row', 
+    alignItems: 'center', 
+    paddingTop: Platform.OS === 'ios' ? 50 : 20, 
+    paddingHorizontal: 8,
+    backgroundColor: Colors.surface 
+  },
+  titleInput: { 
+    flex: 1, 
+    fontSize: 24, 
+    fontWeight: 'bold', 
+    backgroundColor: 'transparent',
+    height: 60
+  },
+  scrollContent: { padding: 20 },
+  contentInput: { 
+    fontSize: 18, 
+    backgroundColor: 'transparent', 
+    minHeight: 300,
+    lineHeight: 24
+  },
+  checklistContainer: { marginTop: 10 },
+  checkItem: { 
+    flexDirection: 'row', 
+    alignItems: 'center', 
+    marginBottom: 8,
+    paddingVertical: 4
+  },
+  checkText: { fontSize: 18, color: Colors.text, flex: 1, marginLeft: 8 },
+  completedText: { 
+    textDecorationLine: 'line-through', 
+    color: Colors.textSecondary,
+    opacity: 0.6 
+  },
+  tagContainer: { 
+    flexDirection: 'row', 
+    flexWrap: 'wrap', 
+    gap: 8, 
+    marginTop: 20,
+    borderTopWidth: 1,
+    borderTopColor: Colors.border,
+    paddingTop: 15
+  },
+  tag: { backgroundColor: Colors.background, borderRadius: 20 },
+  tagText: { color: Colors.primary, fontWeight: '600' }
 });

@@ -1,40 +1,47 @@
-export interface Note {
-  id: string;
-  title: string;
-  content: string;
-  type: 'nota'; // Forzamos el literal para el discriminante
-  createdAt: Date;
-  updatedAt: Date;
+import React from 'react';
+import { View, FlatList, StyleSheet } from 'react-native';
+import { FAB } from 'react-native-paper';
+import { useRouter } from 'expo-router';
+import { useNotesStore } from '../../store/notesStore';
+import NoteCard from '../../components/items/NoteCard';
+import { Colors, Spacing } from '../../constants/theme';
+
+export default function NotesScreen() {
+  const notes = useNotesStore((state) => state.notes);
+  const router = useRouter();
+
+  return (
+    <View style={styles.container}>
+      <FlatList
+        data={notes}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => (
+          <NoteCard 
+            note={item} 
+            onPress={() => router.push(`/(tabs)/${item.id}`)} 
+          />
+        )}
+        contentContainerStyle={styles.list}
+      />
+      
+      <FAB
+        icon="plus"
+        style={styles.fab}
+        onPress={() => router.push('/nueva-nota')}
+        color="white"
+      />
+    </View>
+  );
 }
 
-export interface ChecklistItem {
-  id: string;
-  text: string;
-  isCompleted: boolean;
-}
-
-export interface ChecklistNote {
-  id: string;
-  title: string;
-  items: ChecklistItem[];
-  type: 'lista';
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-export interface IdeaNote {
-  id: string;
-  title: string;
-  content: string;
-  tags: string[];
-  type: 'idea';
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-export type AnyNote = Note | ChecklistNote | IdeaNote;
-
-// Type Guards para que TypeScript no se queje en el renderizado
-export const isNote = (n: AnyNote): n is Note => n.type === 'nota';
-export const isChecklistNote = (n: AnyNote): n is ChecklistNote => n.type === 'lista';
-export const isIdeaNote = (n: AnyNote): n is IdeaNote => n.type === 'idea';
+const styles = StyleSheet.create({
+  container: { flex: 1, backgroundColor: Colors.background },
+  list: { padding: Spacing.md, paddingBottom: 80 },
+  fab: {
+    position: 'absolute',
+    margin: Spacing.lg,
+    right: 0,
+    bottom: 0,
+    backgroundColor: Colors.primary,
+  },
+});

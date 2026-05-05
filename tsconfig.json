@@ -1,38 +1,13 @@
 {
+  "extends": "expo/tsconfig.base",
   "compilerOptions": {
     "strict": true,
-    "jsx": "react-native",
-    "moduleResolution": "bundler",
-    "module": "es2020",
-    "target": "es2020",
-    "lib": ["es2020", "dom"],
-    "allowSyntheticDefaultImports": true,
-    "esModuleInterop": true,
-    "skipLibCheck": true,
-    "resolveJsonModule": true,
-    "noEmit": true,
-    "isolatedModules": true,
-    "allowJs": true,
-    "checkJs": false,
-    "forceConsistentCasingInFileNames": true,
-    "noImplicitReturns": false,
-    "noFallthroughCasesInSwitch": true,
-    "types": ["node"],
-    "paths": {
-      "@/*": ["./*"]
-    }
+    "ignoreDeprecations": "6.0"
   },
   "include": [
     "**/*.ts",
     "**/*.tsx",
     ".expo/types/**/*.ts",
     "expo-env.d.ts"
-  ],
-  "exclude": [
-    "node_modules",
-    "dist",
-    "babel.config.js",
-    "metro.config.js"
-  ],
-  "extends": "expo/tsconfig.base"
+  ]
 }

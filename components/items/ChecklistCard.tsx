@@ -2,7 +2,6 @@ import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Card, Text, ProgressBar, IconButton } from 'react-native-paper';
 import { ChecklistNote } from '../../types';
-// CORRECCIÓN: Si estas constantes fallan, usaremos valores por defecto para evitar el blanco
 import { Colors, Spacing } from '../../constants/theme';
 
 interface ChecklistCardProps {
@@ -12,7 +11,7 @@ interface ChecklistCardProps {
 }
 
 export default function ChecklistCard({ checklist, onPress, onDelete }: ChecklistCardProps) {
-  // CORRECCIÓN: Validamos que 'items' exista y sea un array antes de usar filter
+  // Garantizamos que items sea un array para evitar errores de renderizado
   const items = Array.isArray(checklist.items) ? checklist.items : [];
   const completed = items.filter(i => i.isCompleted).length;
   const total = items.length;
@@ -24,11 +23,11 @@ export default function ChecklistCard({ checklist, onPress, onDelete }: Checklis
         <View style={styles.header}>
           <View style={{ flex: 1 }}>
             <Text variant="titleMedium" numberOfLines={1} style={styles.title}>
-              {checklist.title}
+              {checklist.title || 'Lista sin título'}
             </Text>
-            {/* Si no hay items de lista, mostramos un resumen del contenido */}
+            {/* Si la lista está vacía pero tiene descripción, la mostramos */}
             {total === 0 && checklist.content && (
-              <Text variant="bodySmall" numberOfLines={1} style={{ color: '#666' }}>
+              <Text variant="bodySmall" numberOfLines={1} style={styles.preview}>
                 {checklist.content}
               </Text>
             )}
@@ -37,20 +36,32 @@ export default function ChecklistCard({ checklist, onPress, onDelete }: Checklis
             icon="delete-outline" 
             size={20} 
             onPress={onDelete} 
-            iconColor="#d32f2f"
+            iconColor={Colors.error}
+            style={styles.deleteBtn}
           />
         </View>
 
-        {/* Solo mostramos la barra de progreso si realmente hay items */}
-        {total > 0 && (
-          <View style={styles.progressRow}>
-            <ProgressBar 
-              progress={progress} 
-              color={Colors?.success || '#4CAF50'} 
-              style={styles.progressBar} 
-            />
-            <Text variant="labelSmall">{completed}/{total}</Text>
+        {/* Indicador de progreso visual */}
+        {total > 0 ? (
+          <View style={styles.progressContainer}>
+            <View style={styles.progressRow}>
+              <ProgressBar 
+                progress={progress} 
+                color={progress === 1 ? Colors.success : Colors.primary} 
+                style={styles.progressBar} 
+              />
+              <Text variant="labelSmall" style={styles.progressText}>
+                {completed}/{total}
+              </Text>
+            </View>
+            <Text variant="labelSmall" style={styles.percentage}>
+              {Math.round(progress * 100)}% completado
+            </Text>
           </View>
+        ) : (
+          <Text variant="labelSmall" style={styles.emptyText}>
+            No hay elementos en la lista
+          </Text>
         )}
       </Card.Content>
     </Card>
@@ -59,18 +70,56 @@ export default function ChecklistCard({ checklist, onPress, onDelete }: Checklis
 
 const styles = StyleSheet.create({
   card: { 
-    marginBottom: Spacing?.sm || 12, 
+    marginBottom: Spacing.sm, 
     borderRadius: 16, 
-    backgroundColor: '#fff',
-    elevation: 2 
+    backgroundColor: Colors.surface,
+    elevation: 2,
+    borderWidth: 1,
+    borderColor: Colors.border
   },
   header: { 
     flexDirection: 'row', 
     justifyContent: 'space-between', 
     alignItems: 'center',
-    marginBottom: Spacing?.sm || 8 
+    marginBottom: Spacing.sm 
   },
-  title: { fontWeight: '600' },
-  progressRow: { flexDirection: 'row', alignItems: 'center', gap: Spacing?.sm || 8 },
-  progressBar: { flex: 1, height: 8, borderRadius: 4 },
+  title: { 
+    fontWeight: '700',
+    color: Colors.text 
+  },
+  preview: { 
+    color: Colors.textSecondary,
+    marginTop: 2 
+  },
+  deleteBtn: { 
+    margin: -8 
+  },
+  progressContainer: {
+    marginTop: 4
+  },
+  progressRow: { 
+    flexDirection: 'row', 
+    alignItems: 'center', 
+    gap: Spacing.sm 
+  },
+  progressBar: { 
+    flex: 1, 
+    height: 8, 
+    borderRadius: 4,
+    backgroundColor: Colors.border 
+  },
+  progressText: {
+    color: Colors.text,
+    fontWeight: '600',
+    minWidth: 30
+  },
+  percentage: {
+    color: Colors.textSecondary,
+    marginTop: 4,
+    fontSize: 10
+  },
+  emptyText: {
+    color: Colors.textSecondary,
+    fontStyle: 'italic'
+  }
 });
