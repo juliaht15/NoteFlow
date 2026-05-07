@@ -13,64 +13,56 @@ Aplicación móvil nativa de alto rendimiento diseñada para ofrecer una experie
 
 | Despliegue | URL |
 |------------|-----|
-| Expo Go (Demo) | [Probar en Expo](https://expo.dev/preview/update?message=Despliegue+final+fase+6&updateRuntimeVersion=1.0.0&createdAt=2026-05-03T18%3A31%3A10.198Z&slug=exp&projectId=54b70d35-3f44-4720-9b03-68f2fedb30df&group=0b8ea657-287c-4d87-9439-07e5d0adee57) |
+| Expo Go (Latest Update) | [Probar en Expo](https://expo.dev/preview/update?message=readme+okey&updateRuntimeVersion=1.0.0&createdAt=2026-05-07T12%3A46%3A48.942Z&slug=exp&projectId=54b70d35-3f44-4720-9b03-68f2fedb30df&group=a9a25a69-b685-4724-95e1-a413755f89f7) |
 | Gestión Ágil | [Trello](https://trello.com/b/wE5jLIdP/noteflow) |
 
 ---
 
-## Características
+## 🚀 Características Principales
 
-- **Persistencia Local:** Almacenamiento de datos offline mediante AsyncStorage.
-- **Navegación Nativa:** Sistema de rutas basado en archivos (File-based routing) con Expo Router.
-- **Feedback Táctil:** Integración de Expo Haptics para una experiencia de usuario inmersiva.
-- **Rendimiento Optimizado:** Uso de FlashList para el renderizado eficiente de listas extensas.
+- **Búsqueda en Tiempo Real:** Barra de búsqueda integrada en todas las pantallas para filtrado dinámico de contenido.
+- **Edición Dinámica:** Sistema de guardado automático (Debounce) y gestión de Checklists interactiva desde la vista de detalle.
+- **Checkboxes Visibles:** Interfaz mejorada para listas de tareas con indicadores visuales de estado.
+- **Persistencia Local:** Almacenamiento de datos offline mediante **AsyncStorage**.
+- **Rendimiento Optimizado:** Uso de **FlashList** para el renderizado eficiente de listas extensas.
+- **Feedback Táctil:** Integración de **Expo Haptics** para una respuesta física en las interacciones.
 
 ---
 
-## Tecnologías
+## 🛠️ Tecnologías
 
-| Mobile | Uso |
+| Mobile & UI | Uso |
 |----------|-----|
-| React Native | Framework principal para desarrollo multiplataforma |
-| Expo SDK 51 | Herramientas y servicios para el ecosistema nativo |
-| Expo Router | Gestión de navegación y deep linking |
-| FlashList | Renderizado de listas de alto rendimiento |
+| React Native / Expo 51 | Framework y SDK para desarrollo nativo |
+| React Native Paper | Componentes UI basados en Material Design |
+| Lucide React Native | Iconografía vectorial escalable |
 
 | Estado y Lógica | Uso |
 |---------|-----|
 | Zustand | Gestión de estado global ligera y rápida |
-| AsyncStorage | Persistencia de datos en el dispositivo |
+| Expo Router | Navegación basada en archivos (File-based routing) |
 | Zod | Validación de esquemas y tipos de datos |
 
-| Interfaz | Uso |
-|------------|-----|
-| React Native Paper | Librería de componentes UI con Material Design |
-| Expo Haptics | Respuesta física táctil en interacciones |
-| Lucide React Native | Iconografía vectorial escalable |
-
 ---
 
-## Estructura del proyecto
+## 📂 Estructura del Proyecto
 ```
 noteflow/
-├── app/                    # Rutas y pantallas (Expo Router)
-│   ├── (tabs)/             # Navegación por pestañas
-│   ├── _layout.tsx         # Configuración de navegación global
-│   └── index.tsx           # Pantalla de inicio
+├── app/                # Rutas y pantallas (Expo Router)
+│   ├── (tabs)/         # Navegación por pestañas (Notas, Listas, Ideas)
+│   ├── [id].tsx        # Pantalla de detalle universal y edición dinámica
+│   └── _layout.tsx     # Configuración de navegación global
 ├── src/
-│   ├── components/         # Componentes UI reutilizables
-│   ├── store/              # Estado global con Zustand
-│   ├── hooks/              # Lógica y hooks personalizados
-│   └── utils/              # Funciones auxiliares y validaciones Zod
-├── docs/                   # Documentación técnica y manuales
-├── assets/                 # Imágenes, fuentes y recursos estáticos
-├── app.json                # Configuración de Expo y EAS
-└── package.json
+│   ├── components/     # Componentes UI reutilizables (NoteCard, ChecklistCard, etc.)
+│   ├── store/          # Gestión de estado global con Zustand (notesStore.ts)
+│   └── constants/      # Temas de color, tipografía y espaciados (theme.ts)
+├── assets/             # Recursos estáticos, iconos y splash screen
+└── app.json            # Configuración de Expo y actualizaciones EAS
 ```
 
 ---
 
-## Descargar y ejecutar
+## 💻 Instalación y Desarrollo
 
 ```bash
 # 1. Clonar el repositorio
@@ -83,23 +75,28 @@ npm install
 # 3. Iniciar el servidor de Expo
 npx expo start
 ```
-> **Nota:** Para visualizar la app en un dispositivo físico, descarga la app **Expo Go** y escanea el código QR que aparecerá en tu terminal.
+> **Nota:** Escanea el código QR desde la app **Expo Go** (Android/iOS) para previsualizar en tu dispositivo físico.
 
 ---
 
-## Desplegar en Expo (EAS)
+## 🛰️ Despliegue y Actualizaciones (EAS)
 
-### Build y Update
+Este proyecto utiliza **EAS Update** para el despliegue de actualizaciones críticas y mejoras de UI sin necesidad de reinstalar la aplicación.
 
-1. Configurar el proyecto en el dashboard de Expo.
-2. Ejecutar el build para producción:
-   ```bash
-   eas build --platform all
-   ```
-3. Publicar actualizaciones mediante OTA (Over-the-Air):
-   ```bash
-   eas update --message "Descripción del cambio"
-   ```
+### Actualización Over-the-Air (OTA)
+Para enviar cambios inmediatos a los dispositivos:
+```bash
+eas update --auto
+```
+
+### Generación de Builds Nativa
+```bash
+# Crear build para Android (.apk / .aab)
+eas build --platform android
+
+# Crear build para iOS (.ipa)
+eas build --platform ios
+```
 
 ---
 
