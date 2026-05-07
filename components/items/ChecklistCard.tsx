@@ -3,128 +3,61 @@ import { View, StyleSheet } from 'react-native';
 import { Card, Text, ProgressBar, IconButton } from 'react-native-paper';
 import { ChecklistNote } from '../../types';
 import { Colors, Spacing } from '../../constants/theme';
+import { useNotesStore } from '../../store/notesStore';
 
 interface ChecklistCardProps {
   checklist: ChecklistNote;
   onPress: () => void;
-  onDelete: () => void;
 }
 
-export default function ChecklistCard({ checklist, onPress, onDelete }: ChecklistCardProps) {
+export default function ChecklistCard({ checklist, onPress }: ChecklistCardProps) {
+  const deleteNote = useNotesStore((state) => state.deleteNote);
   const items = Array.isArray(checklist.items) ? checklist.items : [];
   const completed = items.filter(i => i.isCompleted).length;
-  const total = items.length;
-  const progress = total > 0 ? completed / total : 0;
+  const progress = items.length > 0 ? completed / items.length : 0;
 
   const formatDate = (date: any) => {
     const d = new Date(date);
-    return isNaN(d.getTime()) ? 'Reciente' : d.toLocaleDateString('es-ES');
+    return isNaN(d.getTime()) ? 'Reciente' : d.toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' }).replace('.', '');
   };
 
   return (
     <Card mode="elevated" style={styles.card} onPress={onPress}>
       <Card.Content>
         <View style={styles.header}>
-          <View style={{ flex: 1 }}>
-            <Text variant="titleMedium" numberOfLines={1} style={styles.title}>
-              {checklist.title || 'Lista sin título'}
-            </Text>
-            {total === 0 && checklist.content && (
-              <Text variant="bodySmall" numberOfLines={1} style={styles.preview}>
-                {checklist.content}
-              </Text>
-            )}
-          </View>
-          <IconButton 
-            icon="delete-outline" 
-            size={20} 
-            onPress={onDelete} 
-            iconColor={Colors.error}
-            style={styles.deleteBtn}
-          />
+          <Text variant="titleMedium" style={styles.title}>{checklist.title || 'Lista'}</Text>
+          <IconButton icon="delete-outline" size={20} onPress={() => deleteNote(checklist.id)} iconColor={Colors.error} />
         </View>
 
-        {total > 0 ? (
-          <View style={styles.progressContainer}>
-            <View style={styles.progressRow}>
-              <ProgressBar 
-                progress={progress} 
-                color={progress === 1 ? Colors.success : Colors.primary} 
-                style={styles.progressBar} 
-              />
-              <Text variant="labelSmall" style={styles.progressText}>
-                {completed}/{total}
-              </Text>
-            </View>
-          </View>
-        ) : (
-          <Text variant="labelSmall" style={styles.emptyText}>
-            No hay elementos en la lista
-          </Text>
-        )}
+        {/* Vista previa de los elementos de la lista */}
+        <View style={styles.itemsPreview}>
+          {items.slice(0, 3).map((item) => (
+            <Text key={item.id} numberOfLines={1} style={styles.itemText}>
+              {item.isCompleted ? '✓ ' : '○ '} {item.text}
+            </Text>
+          ))}
+          {items.length > 3 && <Text style={styles.moreText}>... y {items.length - 3} más</Text>}
+        </View>
 
-        <Text variant="labelSmall" style={styles.date}>
-          {formatDate(checklist.updatedAt)}
-        </Text>
+        <View style={styles.progressRow}>
+          <ProgressBar progress={progress} color={Colors.primary} style={styles.bar} />
+          <Text variant="labelSmall">{completed}/{items.length}</Text>
+        </View>
+
+        <Text variant="labelSmall" style={styles.date}>{formatDate(checklist.updatedAt)}</Text>
       </Card.Content>
     </Card>
   );
 }
 
 const styles = StyleSheet.create({
-  card: { 
-    marginBottom: Spacing.sm, 
-    borderRadius: 16, 
-    backgroundColor: Colors.surface,
-    elevation: 2,
-    borderWidth: 1,
-    borderColor: Colors.border
-  },
-  header: { 
-    flexDirection: 'row', 
-    justifyContent: 'space-between', 
-    alignItems: 'center',
-    marginBottom: Spacing.sm 
-  },
-  title: { 
-    fontWeight: '700',
-    color: Colors.text 
-  },
-  preview: { 
-    color: Colors.textSecondary,
-    marginTop: 2 
-  },
-  deleteBtn: { 
-    margin: -8 
-  },
-  progressContainer: {
-    marginTop: 4
-  },
-  progressRow: { 
-    flexDirection: 'row', 
-    alignItems: 'center', 
-    gap: Spacing.sm 
-  },
-  progressBar: { 
-    flex: 1, 
-    height: 8, 
-    borderRadius: 4,
-    backgroundColor: Colors.border 
-  },
-  progressText: {
-    color: Colors.text,
-    fontWeight: '600',
-    minWidth: 30
-  },
-  emptyText: {
-    color: Colors.textSecondary,
-    fontStyle: 'italic',
-    marginTop: 4
-  },
-  date: { 
-    color: Colors.textSecondary, 
-    marginTop: 12, 
-    textAlign: 'right', 
-    fontSize: 10 
-  }
+  card: { marginBottom: Spacing.sm, borderRadius: 16, backgroundColor: Colors.surface, elevation: 3 },
+  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  title: { fontWeight: '700', flex: 1 },
+  itemsPreview: { marginVertical: 8 },
+  itemText: { fontSize: 13, color: Colors.textSecondary, marginBottom: 2 },
+  moreText: { fontSize: 11, color: 'lightgray' },
+  progressRow: { flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: 8 },
+  bar: { flex: 1, height: 6, borderRadius: 3 },
+  date: { color: Colors.textSecondary, textAlign: 'right', fontSize: 10, marginTop: 12 }
 });
