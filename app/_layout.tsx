@@ -2,6 +2,7 @@ import { Stack } from 'expo-router';
 import { PaperProvider } from 'react-native-paper';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
+import { Colors } from '../constants/theme';
 
 export default function RootLayout() {
   return (
@@ -11,7 +12,7 @@ export default function RootLayout() {
         <Stack
           screenOptions={{
             headerStyle: {
-              backgroundColor: '#3A86FF', // Color primary de tu theme
+              backgroundColor: Colors.primary,
             },
             headerTintColor: '#fff',
             headerTitleStyle: {
@@ -19,14 +20,12 @@ export default function RootLayout() {
             },
           }}
         >
-          {/* El grupo de pestañas principal */}
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
           
-          {/* El modal de creación */}
           <Stack.Screen 
             name="nueva-nota" 
             options={{ 
-              presentation: 'modal',
+              presentation: 'card',
               title: 'Nueva Entrada',
               headerShown: true
             }} 

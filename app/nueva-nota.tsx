@@ -25,8 +25,6 @@ export default function NuevaNota() {
 
     const id = Date.now().toString();
     const now = new Date();
-
-    // Construimos el payload siguiendo estrictamente la interfaz AnyNote
     let payload: AnyNote;
 
     if (category === 'lista') {
@@ -52,7 +50,7 @@ export default function NuevaNota() {
         updatedAt: now,
         content: content.trim(),
         tags: tag.trim() ? [tag.trim()] : [],
-        color: Colors.ideaColor // Asignamos el color por defecto del tema
+        color: Colors.ideaColor 
       };
     } else {
       payload = {
@@ -69,9 +67,7 @@ export default function NuevaNota() {
     
     try {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    } catch (e) {
-      // Silencioso si no hay haptics
-    }
+    } catch (e) {}
 
     router.back();
   };
@@ -86,11 +82,17 @@ export default function NuevaNota() {
           ),
         }} 
       />
+      {/* CAMBIO 1: Ajuste de behavior y keyboardVerticalOffset */}
       <KeyboardAvoidingView 
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'} 
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined} 
         style={{ flex: 1, backgroundColor: Colors.surface }}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 64 : 0} 
       >
-        <ScrollView contentContainerStyle={styles.container}>
+        <ScrollView 
+          contentContainerStyle={styles.container}
+          // CAMBIO 2: Evita que el teclado se quede pegado al tocar fuera
+          keyboardShouldPersistTaps="handled"
+        >
           <SegmentedButtons
             value={category}
             onValueChange={(val) => setCategory(val as any)}
@@ -131,7 +133,7 @@ export default function NuevaNota() {
             onChangeText={(text) => { setContent(text); setError(''); }} 
             mode="outlined" 
             multiline 
-            numberOfLines={category === 'lista' ? 10 : 6} 
+            numberOfLines={category === 'lista' ? 8 : 6} // Reducido un poco para ganar espacio
             style={styles.input} 
             placeholder={category === 'lista' ? "Ejemplo:\nComprar leche\nLavar el coche" : "Escribe algo..."}
             outlineColor={Colors.border}
@@ -146,6 +148,7 @@ export default function NuevaNota() {
 
           {error ? <HelperText type="error" visible={!!error}>{error}</HelperText> : null}
           
+          {/* CAMBIO 3: Botón de guardar */}
           <Button 
             mode="contained" 
             onPress={handleSave} 
@@ -159,6 +162,9 @@ export default function NuevaNota() {
           <Button mode="text" onPress={() => router.back()} textColor={Colors.textSecondary}>
             Cancelar
           </Button>
+
+          {/* CAMBIO 4: Espaciador final para que el scroll permita subir más el botón */}
+          <View style={{ height: Platform.OS === 'android' ? 20 : 0 }} />
         </ScrollView>
       </KeyboardAvoidingView>
     </>
@@ -166,7 +172,11 @@ export default function NuevaNota() {
 }
 
 const styles = StyleSheet.create({
-  container: { padding: 20, backgroundColor: '#fff' },
+  container: { 
+    padding: 20, 
+    backgroundColor: '#fff',
+    flexGrow: 1, // Importante para que el ScrollView ocupe todo el espacio
+  },
   segment: { marginBottom: 24 },
   input: { marginBottom: 12, backgroundColor: '#fff' },
   helper: { marginBottom: 12, color: '#6B7280' },

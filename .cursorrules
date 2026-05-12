@@ -1,27 +1,36 @@
 # NoteFlow - Cursor AI Rules
-# Stack: React Native + Expo SDK 54 + TypeScript + Expo Router v6 + Zustand + FlashList + React Native Paper + Zod + Haptics
+# Stack: React Native + Expo SDK 51 + TypeScript + Expo Router v4 + Zustand + FlashList + React Native Paper
 
 ## Contexto del Proyecto
-- App de productividad con 3 tipos de contenido: Notas, Ideas, Listas.
+- App de gestión de notas personales con 3 categorías: Notas, Ideas, Listas.
 - Arquitectura: File-based routing con Expo Router.
-- Estado global: Zustand + persistencia en AsyncStorage.
+- Estado global: Zustand con persistencia en AsyncStorage.
 
-## Estructura de Carpetas (IMPORTANTE)
-- app/index.tsx → Redirige a /(tabs).
-- app/(tabs)/index.tsx → Pantalla principal de Notas.
-- app/(tabs)/checklists.tsx → Pantalla de Listas.
+## Estructura de Carpetas
+- app/_layout.tsx → Configuración de Stack y Providers (Paper, SafeArea).
+- app/(tabs)/_layout.tsx → Configuración de navegación inferior (Notas, Listas, Ideas).
+- app/(tabs)/index.tsx → Pantalla de Notas.
+- app/(tabs)/checklists.tsx → Pantalla de Checklists.
 - app/(tabs)/ideas.tsx → Pantalla de Ideas.
-- app/nueva-nota.tsx → Modal de creación (Nota, Lista, Idea).
-- store/notesStore.ts → Estado centralizado.
+- app/(tabs)/[id].tsx → Pantalla de detalle común (lectura/edición).
+- app/nueva-nota.tsx → Pantalla de creación única.
+- components/items/ → Componentes visuales para cada tipo de nota.
+- store/notesStore.ts → Lógica de estado y persistencia.
 
-## Reglas de Código Actualizadas
-1. TypeScript estricto: Evitar 'any'. Usar type guards (isNote, isIdeaNote, isChecklistNote).
-2. Rutas: Las pantallas dentro de (tabs) deben usar ../../ para importar desde store o types.
-3. FlashList: Mantener estimatedItemSize={100} y {...({} as any)} para compatibilidad.
-4. Zustand: Al añadir notas, usar la propiedad 'category' para que el store distribuya el objeto al array correcto.
-5. Fechas: Siempre validar/formatear updatedAt antes de renderizar (puede ser string tras persistencia).
-6. Haptics: Light al eliminar, Success al guardar.
-7. UI: Consistencia con constants/theme.ts. Bordes de 16px para cards.
+## Reglas de Código
+1. **TypeScript:** Uso obligatorio de interfaces de `types/index.ts`. Prohibido el uso de `any`.
+2. **Navegación:** Usar `router.push` para navegación y `router.back` para retroceder. 
+3. **Zustand:** Al añadir/actualizar, asegurar que `updatedAt` se actualice con `new Date()`.
+4. **UI Ergonómica:**
+   - Usar `KeyboardAvoidingView` en pantallas de edición para que el teclado no tape inputs.
+   - Las Cards deben tener un radio de borde de 16px.
+   - Confirmar mediante `Alert.alert` antes de ejecutar acciones de borrado.
+5. **Categorización:**
+   - Notas: `title`, `content`.
+   - Listas: `title`, `items` (array de objetos con `id`, `text`, `isCompleted`).
+   - Ideas: `title`, `content`, `tags`.
+6. **Consistencia:** Respetar siempre los colores y espaciados definidos en `constants/theme.ts`.
 
 ## Restricciones
-- No usar rutas absolutas si fallan; priorizar rutas relativas basadas en la estructura real.
+- No usar `presentation: 'modal'` en `app/_layout.tsx` para evitar fallos de renderizado del teclado; usar `presentation: 'card'`.
+- Mantener los inputs de título en los detalles con `mode="flat"` y sin subrayado para un look limpio.

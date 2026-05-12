@@ -9,13 +9,14 @@ export const Colors = {
   success: '#10B981',
   error: '#EF4444',
 
-  // Colores suaves para las tarjetas (Backgrounds)
+  // Categorías de notas
   noteColor: '#E0E7FF',      // Azul suave
-  ideaColor: '#FED7AA',      // Naranja suave
+  ideaColor: '#FEF9C3',      // Amarillo suave (más estándar para ideas/bombillas)
   checklistColor: '#D1FAE5', // Verde suave
 
-  // Variantes para estados de presión o sombras
+  // Estados
   overlay: 'rgba(0, 0, 0, 0.05)',
+  disabled: '#9CA3AF',
 };
 
 export const Spacing = {
@@ -24,9 +25,9 @@ export const Spacing = {
   md: 16,
   lg: 24,
   xl: 32,
+  xxl: 48,
 };
 
-// Tipado para el objeto global del tema
 export type ThemeColors = typeof Colors;
 export type ThemeSpacing = typeof Spacing;
 

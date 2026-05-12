@@ -7,7 +7,7 @@ export interface BaseNote {
 }
 
 export interface Note extends BaseNote {
-  category: 'nota'; // Forzamos el literal para mejor discriminación
+  category: 'nota';
   content: string;
 }
 
@@ -18,23 +18,22 @@ export interface ChecklistItem {
 }
 
 export interface ChecklistNote extends BaseNote {
-  category: 'lista'; // Forzamos el literal
-  content?: string;
+  category: 'lista';
   items: ChecklistItem[];
+  content?: string;
 }
 
 export interface IdeaNote extends BaseNote {
-  category: 'idea'; // Forzamos el literal
-  content?: string;
+  category: 'idea';
   tags: string[];
-  color: string;
+  content?: string;
+  color?: string;
 }
 
 export type AnyNote = Note | ChecklistNote | IdeaNote;
 
 /**
  * Funciones de validación (Type Guards)
- * Se basan primero en la categoría y luego en la propiedad única para asegurar el tipo.
  */
 
 export function isNote(note: AnyNote): note is Note {
@@ -42,9 +41,9 @@ export function isNote(note: AnyNote): note is Note {
 }
 
 export function isChecklistNote(note: AnyNote): note is ChecklistNote {
-  return note.category === 'lista' && Array.isArray((note as ChecklistNote).items);
+  return note.category === 'lista' && 'items' in note;
 }
 
 export function isIdeaNote(note: AnyNote): note is IdeaNote {
-  return note.category === 'idea' && Array.isArray((note as IdeaNote).tags);
+  return note.category === 'idea' && 'tags' in note;
 }

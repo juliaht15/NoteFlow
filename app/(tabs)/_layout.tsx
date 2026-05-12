@@ -2,6 +2,7 @@ import React from 'react';
 import { Tabs } from 'expo-router';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Colors } from '../../constants/theme';
+import { Platform } from 'react-native';
 
 export default function TabsLayout() {
   return (
@@ -11,11 +12,13 @@ export default function TabsLayout() {
         tabBarInactiveTintColor: Colors.textSecondary,
         tabBarStyle: {
           borderTopColor: Colors.border,
-          elevation: 0, // Quita la sombra en Android
-          shadowOpacity: 0, // Quita la sombra en iOS
+          elevation: 0,
+          shadowOpacity: 0,
+          height: Platform.OS === 'ios' ? 88 : 60,
+          paddingBottom: Platform.OS === 'ios' ? 28 : 10,
         },
         headerStyle: {
-          backgroundColor: Colors.background,
+          backgroundColor: Colors.surface,
         },
         headerTitleStyle: {
           color: Colors.text,
@@ -52,12 +55,11 @@ export default function TabsLayout() {
         }}
       />
       
-      {/* Ocultamos la ruta dinámica para que no aparezca en la barra de navegación */}
       <Tabs.Screen
         name="[id]"
         options={{
           href: null,
-          headerShown: true,
+          headerShown: false,
         }}
       />
     </Tabs>
