@@ -41,7 +41,7 @@ export default function ChecklistCard({ checklist, onPress }: ChecklistCardProps
 
   return (
     <Card 
-      mode="flat" 
+      mode="contained" 
       style={[
         styles.card, 
         { 
@@ -86,4 +86,77 @@ export default function ChecklistCard({ checklist, onPress }: ChecklistCardProps
           </Text>
         </View>
 
-        <Text variant="labelSmall" style={
+        <Text variant="labelSmall" style={[styles.date, { color: currentTheme.textSecondary }]}>
+          {formatDate(checklist.updatedAt)}
+        </Text>
+      </Card.Content>
+    </Card>
+  );
+}
+
+const styles = StyleSheet.create({
+  card: { 
+    borderRadius: theme.BorderRadius.lg, 
+    marginHorizontal: theme.Spacing.md,
+    marginBottom: theme.Spacing.sm,
+    borderBottomWidth: 0.5,
+    elevation: 0, // Evita sombras en modo contained si la versión es MD2
+  },
+  contentContainer: {
+    paddingVertical: theme.Spacing.sm,
+    paddingHorizontal: theme.Spacing.md,
+  },
+  header: { 
+    flexDirection: 'row', 
+    justifyContent: 'space-between', 
+    alignItems: 'center' 
+  },
+  title: { 
+    fontWeight: '600', 
+    flex: 1, 
+    letterSpacing: -0.3 
+  },
+  deleteButton: {
+    margin: 0,
+    padding: 0,
+  },
+  itemsPreview: { 
+    marginVertical: 4 
+  },
+  itemText: { 
+    fontSize: 13, 
+    marginBottom: 2,
+    letterSpacing: -0.1 
+  },
+  moreText: { 
+    fontSize: 11, 
+    opacity: 0.6 
+  },
+  emptyPreview: { 
+    fontSize: 13, 
+    fontStyle: 'italic' 
+  },
+  progressRow: { 
+    flexDirection: 'row', 
+    alignItems: 'center', 
+    gap: 10, 
+    marginTop: theme.Spacing.sm 
+  },
+  bar: { 
+    flex: 1, 
+    height: 4, 
+    borderRadius: 2 
+  },
+  progressText: { 
+    fontSize: 11,
+    minWidth: 30, 
+    textAlign: 'right',
+    fontWeight: '500' 
+  },
+  date: { 
+    textAlign: 'right', 
+    fontSize: 11, 
+    fontWeight: '400',
+    marginTop: theme.Spacing.sm 
+  }
+});
