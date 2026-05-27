@@ -2,8 +2,8 @@ export interface BaseNote {
   id: string;
   title: string;
   category: 'nota' | 'lista' | 'idea';
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface Note extends BaseNote {
@@ -27,7 +27,7 @@ export interface IdeaNote extends BaseNote {
   category: 'idea';
   tags: string[];
   content?: string;
-  color?: string;
+  color: string;
 }
 
 export type AnyNote = Note | ChecklistNote | IdeaNote;
@@ -41,9 +41,9 @@ export function isNote(note: AnyNote): note is Note {
 }
 
 export function isChecklistNote(note: AnyNote): note is ChecklistNote {
-  return note.category === 'lista' && 'items' in note;
+  return note.category === 'lista' && Array.isArray((note as ChecklistNote).items);
 }
 
 export function isIdeaNote(note: AnyNote): note is IdeaNote {
-  return note.category === 'idea' && 'tags' in note;
+  return note.category === 'idea' && Array.isArray((note as IdeaNote).tags);
 }

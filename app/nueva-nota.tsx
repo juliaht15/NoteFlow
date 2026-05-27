@@ -1,13 +1,32 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
+import { View, StyleSheet, KeyboardAvoidingView, Platform, ScrollView, useColorScheme } from 'react-native';
 import { TextInput, Button, HelperText, SegmentedButtons } from 'react-native-paper';
 import { useNotesStore } from '../store/notesStore';
 import { useRouter, Stack } from 'expo-router';
 import * as Haptics from 'expo-haptics';
-import { Colors } from '../constants/theme';
+import theme from '../constants/theme';
 import { AnyNote } from '../types';
+import { z } from 'zod';
+
+const notaSchema = z.object({
+  title: z.string().min(1, 'El título es obligatorio'),
+  content: z.string().min(1, 'El contenido es obligatorio'),
+});
+
+const listaSchema = z.object({
+  title: z.string().min(1, 'El título es obligatorio'),
+  content: z.string().min(1, 'La lista no puede estar vacía'),
+});
+
+const ideaSchema = z.object({
+  title: z.string().min(1, 'El título es obligatorio'),
+  content: z.string().optional(),
+});
 
 export default function NuevaNota() {
+  const colorScheme = useColorScheme();
+  const currentTheme = colorScheme === 'dark' ? theme.Colors.dark : theme.Colors.light;
+
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [tag, setTag] = useState('');
@@ -18,23 +37,37 @@ export default function NuevaNota() {
   const router = useRouter();
 
   const handleSave = () => {
-    if (!title.trim() || (!content.trim() && category !== 'idea')) {
-      setError('El título y el contenido son obligatorios');
-      return;
+    const titleTrimmed = title.trim();
+    const contentTrimmed = content.trim();
+    const tagTrimmed = tag.trim();
+
+    try {
+      if (category === 'nota') {
+        notaSchema.parse({ title: titleTrimmed, content: contentTrimmed });
+      } else if (category === 'lista') {
+        listaSchema.parse({ title: titleTrimmed, content: contentTrimmed });
+      } else if (category === 'idea') {
+        ideaSchema.parse({ title: titleTrimmed, content: contentTrimmed });
+      }
+    } catch (err) {
+      if (err instanceof z.ZodError) {
+        setError(err.errors[0].message);
+        return;
+      }
     }
 
     const id = Date.now().toString();
-    const now = new Date();
+    const nowStr = new Date().toISOString();
     let payload: AnyNote;
 
     if (category === 'lista') {
-      const lines = content.split('\n').filter(line => line.trim() !== '');
+      const lines = contentTrimmed.split('\n').filter(line => line.trim() !== '');
       payload = {
         id,
-        title: title.trim(),
+        title: titleTrimmed,
         category: 'lista',
-        createdAt: now,
-        updatedAt: now,
+        createdAt: nowStr,
+        updatedAt: nowStr,
         items: lines.map((line, index) => ({
           id: `${id}-${index}`,
           text: line.trim(),
@@ -44,31 +77,26 @@ export default function NuevaNota() {
     } else if (category === 'idea') {
       payload = {
         id,
-        title: title.trim(),
+        title: titleTrimmed,
         category: 'idea',
-        createdAt: now,
-        updatedAt: now,
-        content: content.trim(),
-        tags: tag.trim() ? [tag.trim()] : [],
-        color: Colors.ideaColor 
+        createdAt: nowStr,
+        updatedAt: nowStr,
+        content: contentTrimmed,
+        tags: tagTrimmed ? [tagTrimmed] : [],
+        color: currentTheme.ideaColor 
       };
     } else {
       payload = {
         id,
-        title: title.trim(),
+        title: titleTrimmed,
         category: 'nota',
-        createdAt: now,
-        updatedAt: now,
-        content: content.trim()
+        createdAt: nowStr,
+        updatedAt: nowStr,
+        content: contentTrimmed
       };
     }
     
     addNote(payload);
-    
-    try {
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    } catch (e) {}
-
     router.back();
   };
 
@@ -76,42 +104,48 @@ export default function NuevaNota() {
     <>
       <Stack.Screen 
         options={{ 
-          title: 'Crear Nuevo', 
+          title: 'Crear Nuevo',
+          headerStyle: { backgroundColor: currentTheme.background },
+          headerTintColor: currentTheme.text,
+          headerShadowVisible: false,
           headerLeft: () => (
-            <Button onPress={() => router.back()} textColor={Colors.primary}>Salir</Button>
+            <Button onPress={() => router.back()} textColor={currentTheme.primary}>Salir</Button>
           ),
         }} 
       />
-      {/* CAMBIO 1: Ajuste de behavior y keyboardVerticalOffset */}
       <KeyboardAvoidingView 
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined} 
-        style={{ flex: 1, backgroundColor: Colors.surface }}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 64 : 0} 
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'} 
+        style={{ flex: 1, backgroundColor: currentTheme.background }}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 88 : 0} 
       >
         <ScrollView 
-          contentContainerStyle={styles.container}
-          // CAMBIO 2: Evita que el teclado se quede pegado al tocar fuera
+          contentContainerStyle={[styles.container, { backgroundColor: currentTheme.background }]}
           keyboardShouldPersistTaps="handled"
         >
           <SegmentedButtons
             value={category}
-            onValueChange={(val) => setCategory(val as any)}
+            onValueChange={(val) => {
+              setCategory(val as 'nota' | 'lista' | 'idea');
+              setError('');
+            }}
             buttons={[
-              { value: 'nota', label: 'Nota', icon: 'file-document-outline' },
-              { value: 'lista', label: 'Lista', icon: 'format-list-bulleted' },
-              { value: 'idea', label: 'Idea', icon: 'lightbulb-outline' },
+              { value: 'nota', label: 'Nota', icon: 'file-document-outline', checkedColor: '#fff' },
+              { value: 'lista', label: 'Lista', icon: 'format-list-bulleted', checkedColor: '#fff' },
+              { value: 'idea', label: 'Idea', icon: 'lightbulb-outline', checkedColor: '#fff' },
             ]}
             style={styles.segment}
+            theme={{ colors: { primary: currentTheme.primary } }}
           />
 
           <TextInput 
             label="Título" 
             value={title} 
             onChangeText={(text) => { setTitle(text); setError(''); }} 
-            mode="outlined" 
-            style={styles.input} 
-            outlineColor={Colors.border}
-            activeOutlineColor={Colors.primary}
+            mode="flat" 
+            style={[styles.input, { backgroundColor: currentTheme.surface, color: currentTheme.text }]} 
+            underlineColor="transparent"
+            activeUnderlineColor="transparent"
+            textColor={currentTheme.text}
           />
 
           {category === 'idea' && (
@@ -119,11 +153,12 @@ export default function NuevaNota() {
               label="Etiqueta (ej. Trabajo, Viajes)" 
               value={tag} 
               onChangeText={setTag} 
-              mode="outlined" 
-              style={styles.input}
-              outlineColor={Colors.border}
-              activeOutlineColor={Colors.primary}
-              left={<TextInput.Icon icon="tag-outline" />}
+              mode="flat" 
+              style={[styles.input, { backgroundColor: currentTheme.surface, color: currentTheme.text }]}
+              underlineColor="transparent"
+              activeUnderlineColor="transparent"
+              textColor={currentTheme.text}
+              left={<TextInput.Icon icon="tag-outline" color={currentTheme.textSecondary} />}
             />
           )}
           
@@ -131,40 +166,40 @@ export default function NuevaNota() {
             label={category === 'lista' ? "Elementos de la lista" : "Contenido"} 
             value={content} 
             onChangeText={(text) => { setContent(text); setError(''); }} 
-            mode="outlined" 
+            mode="flat" 
             multiline 
-            numberOfLines={category === 'lista' ? 8 : 6} // Reducido un poco para ganar espacio
-            style={styles.input} 
+            numberOfLines={category === 'lista' ? 8 : 6} 
+            style={[styles.input, { backgroundColor: currentTheme.surface, color: currentTheme.text }]} 
             placeholder={category === 'lista' ? "Ejemplo:\nComprar leche\nLavar el coche" : "Escribe algo..."}
-            outlineColor={Colors.border}
-            activeOutlineColor={Colors.primary}
+            placeholderTextColor={currentTheme.textSecondary}
+            underlineColor="transparent"
+            activeUnderlineColor="transparent"
+            textColor={currentTheme.text}
           />
 
           {category === 'lista' && (
-            <HelperText type="info" visible={true} style={styles.helper}>
+            <HelperText type="info" visible={true} style={[styles.helper, { color: currentTheme.textSecondary }]}>
               * Escribe cada elemento en una línea nueva.
             </HelperText>
           )}
 
-          {error ? <HelperText type="error" visible={!!error}>{error}</HelperText> : null}
+          {error ? <HelperText type="error" visible={!!error} style={{ color: currentTheme.error }}>{error}</HelperText> : null}
           
-          {/* CAMBIO 3: Botón de guardar */}
           <Button 
             mode="contained" 
             onPress={handleSave} 
-            style={styles.button} 
-            buttonColor={Colors.primary}
+            style={[styles.button, { borderRadius: theme.BorderRadius.md }]} 
+            buttonColor={currentTheme.primary}
             labelStyle={styles.buttonLabel}
           >
             Guardar {category}
           </Button>
           
-          <Button mode="text" onPress={() => router.back()} textColor={Colors.textSecondary}>
+          <Button mode="text" onPress={() => router.back()} textColor={currentTheme.textSecondary}>
             Cancelar
           </Button>
 
-          {/* CAMBIO 4: Espaciador final para que el scroll permita subir más el botón */}
-          <View style={{ height: Platform.OS === 'android' ? 20 : 0 }} />
+          <View style={{ height: theme.Spacing.lg }} />
         </ScrollView>
       </KeyboardAvoidingView>
     </>
@@ -173,13 +208,29 @@ export default function NuevaNota() {
 
 const styles = StyleSheet.create({
   container: { 
-    padding: 20, 
-    backgroundColor: '#fff',
-    flexGrow: 1, // Importante para que el ScrollView ocupe todo el espacio
+    padding: theme.Spacing.md, 
+    flexGrow: 1,
   },
-  segment: { marginBottom: 24 },
-  input: { marginBottom: 12, backgroundColor: '#fff' },
-  helper: { marginBottom: 12, color: '#6B7280' },
-  button: { marginTop: 16, marginBottom: 8, paddingVertical: 6, borderRadius: 12 },
-  buttonLabel: { fontSize: 16, fontWeight: 'bold', textTransform: 'capitalize' }
+  segment: { 
+    marginBottom: theme.Spacing.lg 
+  },
+  input: { 
+    marginBottom: theme.Spacing.sm,
+    borderRadius: theme.BorderRadius.md,
+    borderTopLeftRadius: theme.BorderRadius.md,
+    borderTopRightRadius: theme.BorderRadius.md,
+  },
+  helper: { 
+    marginBottom: theme.Spacing.sm,
+  },
+  button: { 
+    marginTop: theme.Spacing.md, 
+    marginBottom: theme.Spacing.xs, 
+    paddingVertical: 4, 
+  },
+  buttonLabel: { 
+    fontSize: 16, 
+    fontWeight: '600', 
+    textTransform: 'capitalize' 
+  }
 });

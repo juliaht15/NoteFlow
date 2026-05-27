@@ -15,12 +15,15 @@ build/
 *.ipa
 
 # IDE y Editores
-.vscode/
 .idea/
 *.swp
 *.swo
 *~
 .DS_Store
+
+# Permitir configuración de Cursor y VS Code en equipo
+!.vscode/
+!.cursorrules
 
 # Logs y Debugging
 npm-debug.log*
@@ -30,7 +33,10 @@ lerna-debug.log*
 .pnpm-debug.log*
 
 # Entorno y Secretos (Seguridad)
-.env*
+.env
+.env.local
+.env.production
+.env.development
 !.env.example
 
 # TypeScript y Caché

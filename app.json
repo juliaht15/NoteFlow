@@ -5,13 +5,13 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
+    "userInterfaceStyle": "automatic",
     "scheme": "noteflow",
-    "newArchEnabled": true,
+    "newArchEnabled": false,
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#3A86FF"
+      "backgroundColor": "#F2F2F7"
     },
     "assetBundlePatterns": [
       "**/*"
@@ -19,15 +19,15 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.juliaht15.noteflow",
-      "userInterfaceStyle": "light"
+      "userInterfaceStyle": "automatic"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#3A86FF"
+        "backgroundColor": "#F2F2F7"
       },
       "package": "com.juliaht15.noteflow",
-      "userInterfaceStyle": "light"
+      "userInterfaceStyle": "automatic"
     },
     "web": {
       "favicon": "./assets/favicon.png",
