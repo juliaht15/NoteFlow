@@ -1,30 +1,31 @@
 import React from 'react';
+import { useColorScheme, Platform } from 'react-native';
 import { Tabs } from 'expo-router';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Colors } from '../../constants/theme';
-import { Platform } from 'react-native';
 
 export default function TabsLayout() {
+  const colorScheme = useColorScheme();
+  const currentTheme = colorScheme === 'dark' ? Colors.dark : Colors.light;
+
   return (
     <Tabs 
       screenOptions={{ 
-        tabBarActiveTintColor: Colors.primary,
-        tabBarInactiveTintColor: Colors.textSecondary,
+        // Colores de interacción dinámicos según el modo del sistema
+        tabBarActiveTintColor: currentTheme.primary,
+        tabBarInactiveTintColor: currentTheme.textSecondary,
         tabBarStyle: {
-          borderTopColor: Colors.border,
+          backgroundColor: currentTheme.surface,
+          borderTopColor: currentTheme.border,
+          borderTopWidth: 1,
           elevation: 0,
           shadowOpacity: 0,
-          height: Platform.OS === 'ios' ? 88 : 60,
-          paddingBottom: Platform.OS === 'ios' ? 28 : 10,
+          height: Platform.OS === 'ios' ? 88 : 64,
+          paddingBottom: Platform.OS === 'ios' ? 30 : 12,
+          paddingTop: 8,
         },
-        headerStyle: {
-          backgroundColor: Colors.surface,
-        },
-        headerTitleStyle: {
-          color: Colors.text,
-          fontWeight: 'bold',
-        },
-        headerShown: true 
+        // Ocultamos la cabecera superior nativa para lucir los títulos integrados en el lienzo
+        headerShown: false 
       }}
     >
       <Tabs.Screen
@@ -32,7 +33,7 @@ export default function TabsLayout() {
         options={{
           title: 'Notas',
           tabBarIcon: ({ color, size }) => (
-            <MaterialCommunityIcons name="file-document-outline" size={size} color={color} />
+            <MaterialCommunityIcons name="file-document-outline" size={size || 24} color={color} />
           ),
         }}
       />
@@ -41,7 +42,7 @@ export default function TabsLayout() {
         options={{
           title: 'Listas',
           tabBarIcon: ({ color, size }) => (
-            <MaterialCommunityIcons name="format-list-bulleted" size={size} color={color} />
+            <MaterialCommunityIcons name="checkbox-marked-circle-outline" size={size || 24} color={color} />
           ),
         }}
       />
@@ -50,16 +51,16 @@ export default function TabsLayout() {
         options={{
           title: 'Ideas',
           tabBarIcon: ({ color, size }) => (
-            <MaterialCommunityIcons name="lightbulb-outline" size={size} color={color} />
+            <MaterialCommunityIcons name="lightbulb-on-outline" size={size || 24} color={color} />
           ),
         }}
       />
       
+      {/* Ocultamos de la barra la pestaña dinámica del detalle de nota */}
       <Tabs.Screen
         name="[id]"
         options={{
           href: null,
-          headerShown: false,
         }}
       />
     </Tabs>

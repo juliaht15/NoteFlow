@@ -3,21 +3,16 @@
   "compilerOptions": {
     "strict": true,
     "ignoreDeprecations": "6.0",
+    "jsx": "react-native",
+    "baseUrl": ".",
     "paths": {
-      "@/*": ["./*"]
+      "@/*": [
+        "*"
+      ]
     }
   },
   "include": [
     "**/*.ts",
-    "**/*.tsx",
-    ".expo/types/**/*.ts",
-    "expo-env.d.ts",
-    "app/**/*.ts",
-    "app/**/*.tsx",
-    "components/**/*.ts",
-    "components/**/*.tsx",
-    "store/**/*.ts",
-    "types/**/*.ts",
-    "constants/**/*.ts"
+    "**/*.tsx"
   ]
 }

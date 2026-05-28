@@ -1,56 +1,65 @@
-import { Stack } from 'expo-router';
-import { MD3DarkTheme, MD3LightTheme, PaperProvider } from 'react-native-paper';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { StatusBar } from 'expo-status-bar';
-import { useColorScheme } from 'react-native';
-import theme from '../constants/theme';
+import React from 'react';
+import { useColorScheme, Platform } from 'react-native';
+import { Tabs } from 'expo-router';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { Colors } from '../constants/theme';
 
-export default function RootLayout() {
+export default function TabsLayout() {
   const colorScheme = useColorScheme();
-  const isDark = colorScheme === 'dark';
-  const currentTheme = isDark ? theme.Colors.dark : theme.Colors.light;
-
-  const paperTheme = {
-    ...(isDark ? MD3DarkTheme : MD3LightTheme),
-    colors: {
-      ...(isDark ? MD3DarkTheme.colors : MD3LightTheme.colors),
-      primary: currentTheme.primary,
-      background: currentTheme.background,
-      surface: currentTheme.surface,
-    },
-  };
+  const currentTheme = colorScheme === 'dark' ? Colors.dark : Colors.light;
 
   return (
-    <SafeAreaProvider>
-      <PaperProvider theme={paperTheme}>
-        <StatusBar style={isDark ? 'light' : 'dark'} />
-        <Stack
-          screenOptions={{
-            headerStyle: {
-              backgroundColor: currentTheme.background,
-            },
-            headerTintColor: currentTheme.text,
-            headerTitleStyle: {
-              fontWeight: '600',
-            },
-            headerShadowVisible: false,
-            contentStyle: {
-              backgroundColor: currentTheme.background,
-            },
-          }}
-        >
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          
-          <Stack.Screen 
-            name="nueva-nota" 
-            options={{ 
-              presentation: 'card',
-              title: 'Nueva Entrada',
-              headerShown: true,
-            }} 
-          />
-        </Stack>
-      </PaperProvider>
-    </SafeAreaProvider>
+    <Tabs 
+      screenOptions={{ 
+        tabBarActiveTintColor: currentTheme.primary,
+        tabBarInactiveTintColor: currentTheme.textSecondary,
+        tabBarStyle: {
+          backgroundColor: currentTheme.surface,
+          borderTopColor: currentTheme.border,
+          borderTopWidth: 1,
+          elevation: 0,
+          shadowOpacity: 0,
+          height: Platform.OS === 'ios' ? 88 : 64,
+          paddingBottom: Platform.OS === 'ios' ? 30 : 12,
+          paddingTop: 8,
+        },
+        headerShown: false 
+      }}
+    >
+      <Tabs.Screen
+        name="index"
+        options={{
+          title: 'Notas',
+          tabBarIcon: ({ color, size }) => (
+            <MaterialCommunityIcons name="file-document-outline" size={size || 24} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="checklists"
+        options={{
+          title: 'Listas',
+          tabBarIcon: ({ color, size }) => (
+            <MaterialCommunityIcons name="checkbox-marked-circle-outline" size={size || 24} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="ideas"
+        options={{
+          title: 'Ideas',
+          tabBarIcon: ({ color, size }) => (
+            <MaterialCommunityIcons name="lightbulb-on-outline" size={size || 24} color={color} />
+          ),
+        }}
+      />
+      
+      <Tabs.Screen
+        name="[id]"
+        options={{
+          href: null,
+        }}
+      />
+    </Tabs>
   );
 }

@@ -1,96 +1,103 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, FlatList } from 'react-native';
-import { Text, FAB, Searchbar } from 'react-native-paper';
+import { View, StyleSheet, useColorScheme, Pressable } from 'react-native';
+import { Text, Searchbar } from 'react-native-paper';
+import { FlashList as ShopifyFlashList } from '@shopify/flash-list';
+import Animated, { FadeInDown, FadeOutLeft } from 'react-native-reanimated';
+import { useRouter } from 'expo-router';
+import * as Haptics from 'expo-haptics';
 import { useNotesStore } from '../../store/notesStore';
 import IdeaCard from '../../components/items/IdeaCard';
-import { Colors, Spacing } from '../../constants/theme';
-import { useRouter } from 'expo-router';
+import { isIdeaNote } from '../../types';
+import { Colors, Spacing, BorderRadius } from '../../constants/theme';
+
+// Forzamos el tipado dinámico para eliminar el error de estimatedItemSize
+const FlashList = ShopifyFlashList as any;
 
 export default function IdeasScreen() {
   const router = useRouter();
-  const { ideas } = useNotesStore();
-  
+  const colorScheme = useColorScheme();
+  const currentTheme = colorScheme === 'dark' ? Colors.dark : Colors.light;
+
+  const notes = useNotesStore((state) => state.notes);
   const [searchQuery, setSearchQuery] = useState('');
 
-  const filteredIdeas = ideas.filter(idea => 
+  const pureIdeas = notes.filter(isIdeaNote);
+
+  const filteredIdeas = pureIdeas.filter(idea =>
     idea.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    idea.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()))
+    (idea.tags && idea.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase())))
   );
 
   return (
-    <View style={styles.container}>
-      <Text variant="headlineMedium" style={styles.header}>Mis Ideas</Text>
+    <View style={[styles.container, { backgroundColor: currentTheme.background }]}>
+      <Text style={[styles.headerTitle, { color: currentTheme.text }]}>
+        Mis Ideas
+      </Text>
 
       <Searchbar
-        placeholder="Buscar ideas o etiquetas..."
+        placeholder="Buscar por idea o #etiqueta..."
         onChangeText={setSearchQuery}
         value={searchQuery}
-        style={styles.searchBar}
-        inputStyle={styles.searchInput}
-        iconColor={Colors.primary}
-      />
-      
-      <FlatList
-        data={filteredIdeas}
-        keyExtractor={(item) => item.id}
-        contentContainerStyle={styles.list}
-        showsVerticalScrollIndicator={false}
-        renderItem={({ item }) => (
-          <IdeaCard idea={item} onPress={() => router.push(`/${item.id}`)} />
-        )}
-        ListEmptyComponent={
-          <Text style={styles.emptyText}>
-            {searchQuery ? 'No se encontraron ideas que coincidan' : 'No tienes ideas guardadas'}
-          </Text>
-        }
+        style={[styles.searchBar, { backgroundColor: colorScheme === 'dark' ? '#1C1C1E' : '#F2F2F7' }]}
+        inputStyle={{ color: currentTheme.text, minHeight: 0 }}
+        placeholderTextColor={currentTheme.textSecondary}
+        iconColor={currentTheme.textSecondary}
+        rippleColor="transparent"
+        mode="bar"
+        elevation={0}
       />
 
-      <FAB 
-        icon="plus" 
-        style={styles.fab} 
-        color="white" 
-        onPress={() => router.push('/nueva-nota')} 
-      />
+      <View style={{ flex: 1, minHeight: 1 }}>
+        <FlashList
+          data={filteredIdeas}
+          keyExtractor={(item: any) => item.id}
+          estimatedItemSize={68}
+          contentContainerStyle={styles.listContent}
+          showsVerticalScrollIndicator={false}
+          renderItem={({ item, index }: any) => (
+            <Animated.View
+              entering={FadeInDown.delay(index * 40).duration(300)}
+              exiting={FadeOutLeft.duration(200)}
+            >
+              <IdeaCard 
+                idea={item} 
+                onPress={() => router.push(`/(tabs)/${item.id}`)} 
+              />
+            </Animated.View>
+          )}
+          ListEmptyComponent={
+            <View style={styles.emptyContainer}>
+              <Text style={{ color: currentTheme.textSecondary, fontSize: 14 }}>
+                {searchQuery ? 'No se encontraron ideas' : 'No hay rastro de ideas aún'}
+              </Text>
+            </View>
+          }
+        />
+      </View>
+
+      <Pressable
+        style={({ pressed }) => [
+          styles.fabButton,
+          { backgroundColor: currentTheme.primary },
+          pressed && { opacity: 0.85 }
+        ]}
+        onPress={() => {
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+          router.push('/nueva-nota');
+        }}
+      >
+        <Text style={styles.fabIcon}>+</Text>
+      </Pressable>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { 
-    flex: 1, 
-    backgroundColor: Colors.background, 
-    paddingHorizontal: Spacing.md, 
-    paddingTop: 60 
-  },
-  header: { 
-    fontWeight: 'bold', 
-    marginBottom: Spacing.sm, 
-    color: Colors.primary 
-  },
-  searchBar: {
-    marginBottom: Spacing.md,
-    borderRadius: 12,
-    backgroundColor: Colors.surface,
-    elevation: 2,
-  },
-  searchInput: {
-    fontSize: 16,
-  },
-  list: { 
-    paddingBottom: 100 
-  },
-  emptyText: {
-    textAlign: 'center',
-    marginTop: 40,
-    color: Colors.textSecondary,
-    fontStyle: 'italic'
-  },
-  fab: { 
-    position: 'absolute', 
-    margin: 16, 
-    right: 0, 
-    bottom: 0, 
-    backgroundColor: Colors.primary,
-    borderRadius: 16,
-  }
+  container: { flex: 1, paddingTop: 20 },
+  headerTitle: { fontSize: 28, fontWeight: '700', marginHorizontal: Spacing.lg, marginBottom: Spacing.sm, letterSpacing: -0.5 },
+  searchBar: { marginHorizontal: Spacing.lg, marginBottom: Spacing.md, borderRadius: BorderRadius.md, height: 40 },
+  listContent: { paddingBottom: 100 },
+  emptyContainer: { flex: 1, alignItems: 'center', justifyContent: 'center', marginTop: 60 },
+  fabButton: { position: 'absolute', right: Spacing.lg, bottom: Spacing.xl, width: 52, height: 52, borderRadius: BorderRadius.round, alignItems: 'center', justifyContent: 'center', shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.08, shadowRadius: 4, elevation: 3 },
+  fabIcon: { color: '#FFFFFF', fontSize: 26, fontWeight: '300', marginTop: -2 }
 });

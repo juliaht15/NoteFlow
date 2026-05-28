@@ -1,45 +1,19 @@
-# NoteFlow - Cursor AI Rules
-# Stack: React Native + Expo SDK 51 + TypeScript + Expo Router v3 + Zustand + FlashList + React Native Paper
+# Reglas de Desarrollo para NoteFlow
 
-## Contexto del Proyecto
-- App de gestión de notas personales de gama alta con 3 categorías: Notas, Checklists, Ideas.
-- Estética y UX: Inspirada en iOS Notes y Microsoft To-Do (diseño nativo premium, minimalista, limpio, sin cabeceras redundantes ni bordes toscos de estilo web).
-- Arquitectura: File-based routing con Expo Router.
-- Estado global: Zustand con persistencia en AsyncStorage.
+## Stack Tecnológico
+- React Native con Expo SDK (v51)
+- Expo Router (Enrutamiento basado en archivos)
+- Zustand (Gestión de estado global persistente con AsyncStorage)
+- TypeScript (Tipado estricto)
+- React Native Paper (Componentes base)
 
-## Estructura de Carpetas
-- app/_layout.tsx → Configuración de Stack y Providers (Paper, SafeArea, Theme).
-- app/(tabs)/_layout.tsx → Configuración de navegación inferior nativa por pestañas.
-- app/(tabs)/notas.tsx → Listado principal de notas de texto.
-- app/(tabs)/checklists.tsx → Gestión de listas de tareas.
-- app/(tabs)/ideas.tsx → Espacio para notas rápidas con etiquetas.
-- app/notas/[id].tsx → Vista y edición dinámica de una nota.
-- app/checklists/[id].tsx → Vista y edición dinámica de un checklist.
-- app/ideas/[id].tsx → Vista y edición dinámica de una idea.
-- app/nueva-nota.tsx → Pantalla modal nativa de creación unificada.
-- components/items/ → Componentes de tarjeta de alto rendimiento (NoteCard, ChecklistCard, IdeaCard).
-- store/notesStore.ts → Lógica de estado global, acciones de mutación y rehidratación.
-- types/index.ts → Contratos de TypeScript y Type Guards en tiempo de ejecución.
-- constants/theme.ts → Tokens de diseño y soporte nativo para Modo Claro y Modo Oscuro.
+## Preferencias de Diseño y UX
+- **Estilo Visual:** Diseño estrictamente plano, limpio y minimalista. Inspirado en la interfaz de "Microsoft To Do".
+- **Estructura:** Evitar tarjetas con sombras pronunciadas, bordes excesivamente gruesos o diseños sobrecargados de Material Design. Usar separadores finos de línea (`borderBottomWidth: 1`) para las listas.
+- **Modo Oscuro:** Soporte nativo y limpio utilizando el hook `useColorScheme` y las constantes de `constants/theme.ts`.
 
-## Reglas de Código y Arquitectura
-1. **TypeScript Estricto:** Uso obligatorio de las interfaces definidas en `types/index.ts`. Prohibido el uso de `any`. Emplear los Type Guards (`isNote`, `isChecklist`, `isIdea`) para el renderizado condicional seguro.
-2. **Listas de Alto Rendimiento:** Utilizar exclusivamente `@shopify/flash-list` en lugar de `FlatList`. Es obligatorio definir la propiedad `estimatedItemSize` en cada implementación para optimizar el reciclaje de memoria.
-3. **Validación de Formularios:** Validar todas las entradas de creación y edición en `nueva-nota.tsx` utilizando esquemas de `zod`. Los mensajes de error deben mostrarse debajo de los inputs.
-4. **Zustand & Persistencia:** Todas las mutaciones de datos deben persistirse mediante el middleware de Zustand integrado con `@react-native-async-storage/async-storage`. Garantizar que `updatedAt` se guarde como un string ISO o Date válido.
-5. **UI Nativa y Ergonómica:**
-   - Prohibido renderizar barras de título o cabeceras duplicadas que imiten la web. Confiar en la navegación del sistema operativo.
-   - Implementar `KeyboardAvoidingView` envolviendo las vistas de formulario. Configurar `behavior="padding"` para iOS y `behavior="height"` para Android de forma condicional.
-   - Usar `Alert.alert` nativo para confirmaciones críticas (como el borrado definitivo de elementos).
-
-## Feedback Táctil y UX Premium
-1. **Aptics:** Utilizar `expo-haptics` para elevar la percepción de calidad de la app:
-   - `Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)` al eliminar notas, archivar o realizar interacciones rápidas.
-   - `Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success)` al completar la totalidad de las tareas de un checklist.
-2. **Animaciones:** Envolver las tarjetas en las listas utilizando componentes animados de `react-native-reanimated` con transiciones suaves de entrada (`FadeInDown`) y salida.
-3. **Estados Vacíos:** Mostrar interfaces limpias y minimalistas cuando una pestaña no contenga elementos, invitando al usuario a crear contenido.
-
-## Restricciones de Navegación y UI
-- No usar `presentation: 'modal'` si genera fallos de renderizado del teclado con componentes específicos de la librería de UI; priorizar `presentation: 'card'` o envolver adecuadamente los contenedores nativos en `app/_layout.tsx`.
-- Soporte dinámico para Modo Claro (`#F2F2F7`) y Modo Oscuro OLED (`#000000`) leyendo siempre el hook `useColorScheme` de React Native y mapeando los tokens de `constants/theme.ts`.
-- Los componentes visuales de las tarjetas de notas deben usar `borderRadius: 16` y márgenes consistentes basados en la escala del tema.
+## Buenas Prácticas y TypeScript
+- Mantener tipados estrictos basados en las uniones de `AnyNote`, `Note`, `ChecklistNote` e `IdeaNote` definidas en `types/index.ts`.
+- Utilizar siempre las funciones de validación de tipos (Type Guards) como `isNote`, `isChecklistNote` e `isIdeaNote` al filtrar o renderizar listas de elementos.
+- Para listas con scroll, priorizar el uso de `<FlashList />` de `@shopify/flash-list` especificando siempre de forma obligatoria la propiedad `estimatedItemSize`.
+- Mantener las rutas de importación relativas limpias y bien estructuradas.
