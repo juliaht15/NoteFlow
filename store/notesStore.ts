@@ -5,63 +5,41 @@ import { AnyNote } from '../types';
 
 interface NotesState {
   notes: AnyNote[];
-  addNote: (note: AnyNote) => void;
+  addNote: (note: Omit<AnyNote, 'id' | 'createdAt' | 'updatedAt'>) => void;
+  updateNote: (id: string, note: Partial<AnyNote>) => void;
   deleteNote: (id: string) => void;
-  updateNote: (id: string, updates: Partial<AnyNote>) => void;
-  toggleChecklistItem: (noteId: string, itemId: string) => void;
-  clearAll: () => void;
 }
 
 export const useNotesStore = create<NotesState>()(
   persist(
     (set) => ({
       notes: [],
+      
+      // Tipamos noteData exactamente igual que en la interfaz para eliminar el error de asignación
+      addNote: (noteData: Omit<AnyNote, 'id' | 'createdAt' | 'updatedAt'>) => set((state) => {
+        const newNote: AnyNote = {
+          ...noteData,
+          id: Math.random().toString(36).substring(2, 9),
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        } as AnyNote;
+        return { notes: [newNote, ...state.notes] };
+      }),
 
-      // Añadir cualquier nuevo elemento al principio de la lista
-      addNote: (note) =>
-        set((state) => ({
-          notes: [note, ...state.notes],
-        })),
+      updateNote: (id: string, updatedFields: Partial<AnyNote>) => set((state) => ({
+        notes: state.notes.map((note) =>
+          note.id === id 
+            ? { ...note, ...updatedFields, updatedAt: new Date().toISOString() } 
+            : note
+        ),
+      })),
 
-      // Eliminar una nota, lista o idea por su ID único
-      deleteNote: (id) =>
-        set((state) => ({
-          notes: state.notes.filter((note) => note.id !== id),
-        })),
-
-      // Actualizar los campos cambiados (título, contenido, etc.) refrescando la fecha de edición
-      updateNote: (id, updates) =>
-        set((state) => ({
-          notes: state.notes.map((note) =>
-            note.id === id
-              ? ({ ...note, ...updates, updatedAt: new Date().toISOString() } as AnyNote)
-              : note
-          ),
-        })),
-
-      // Buscar un checklist y marcar/desmarcar una de sus tareas internas
-      toggleChecklistItem: (noteId, itemId) =>
-        set((state) => ({
-          notes: state.notes.map((note) => {
-            if (note.id === noteId && 'items' in note) {
-              const updatedItems = note.items.map((item) =>
-                item.id === itemId ? { ...item, isCompleted: !item.isCompleted } : item
-              );
-              return {
-                ...note,
-                items: updatedItems,
-                updatedAt: new Date().toISOString(),
-              };
-            }
-            return note;
-          }),
-        })),
-
-      // Limpiar por completo el almacén de datos si fuera necesario
-      clearAll: () => set({ notes: [] }),
+      deleteNote: (id: string) => set((state) => ({
+        notes: state.notes.filter((note) => note.id !== id),
+      })),
     }),
     {
-      name: 'noteflow-storage', // Clave única para guardar los datos en el dispositivo
+      name: 'notes-storage',
       storage: createJSONStorage(() => AsyncStorage),
     }
   )
