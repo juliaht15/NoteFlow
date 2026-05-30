@@ -5,41 +5,25 @@ import { AnyNote } from '../types';
 
 interface NotesState {
   notes: AnyNote[];
-  addNote: (note: Omit<AnyNote, 'id' | 'createdAt' | 'updatedAt'>) => void;
-  updateNote: (id: string, note: Partial<AnyNote>) => void;
+  addNote: (note: AnyNote) => void;
   deleteNote: (id: string) => void;
+  updateNote: (id: string, updates: Partial<AnyNote>) => void;
 }
 
 export const useNotesStore = create<NotesState>()(
   persist(
     (set) => ({
       notes: [],
-      
-      // Tipamos noteData exactamente igual que en la interfaz para eliminar el error de asignación
-      addNote: (noteData: Omit<AnyNote, 'id' | 'createdAt' | 'updatedAt'>) => set((state) => {
-        const newNote: AnyNote = {
-          ...noteData,
-          id: Math.random().toString(36).substring(2, 9),
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        } as AnyNote;
-        return { notes: [newNote, ...state.notes] };
-      }),
-
-      updateNote: (id: string, updatedFields: Partial<AnyNote>) => set((state) => ({
-        notes: state.notes.map((note) =>
-          note.id === id 
-            ? { ...note, ...updatedFields, updatedAt: new Date().toISOString() } 
-            : note
-        ),
+      addNote: (note) => set((state) => ({ notes: [note, ...state.notes] })),
+      deleteNote: (id) => set((state) => ({ 
+        notes: state.notes.filter((n) => n.id !== id) 
       })),
-
-      deleteNote: (id: string) => set((state) => ({
-        notes: state.notes.filter((note) => note.id !== id),
+      updateNote: (id, updates) => set((state) => ({
+        notes: state.notes.map((n) => (n.id === id ? { ...n, ...updates } as AnyNote : n)),
       })),
     }),
     {
-      name: 'notes-storage',
+      name: 'noteflow-storage',
       storage: createJSONStorage(() => AsyncStorage),
     }
   )

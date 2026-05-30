@@ -1,19 +1,20 @@
 # Reglas de Desarrollo para NoteFlow
 
 ## Stack Tecnológico
-- React Native con Expo SDK (v51)
-- Expo Router (Enrutamiento basado en archivos)
-- Zustand (Gestión de estado global persistente con AsyncStorage)
-- TypeScript (Tipado estricto)
-- React Native Paper (Componentes base)
+- React Native con Expo SDK (v54)
+- Expo Router v4 (Enrutamiento basado en archivos nativo)
+- Zustand (Gestión de estado global con persistencia en AsyncStorage)
+- Zod (Validación estricta de esquemas y formularios)
+- TypeScript (Tipado estricto, sin uso de 'any')
+- React Native Paper (Componentes base adaptados)
 
 ## Preferencias de Diseño y UX
-- **Estilo Visual:** Diseño estrictamente plano, limpio y minimalista. Inspirado en la interfaz de "Microsoft To Do".
-- **Estructura:** Evitar tarjetas con sombras pronunciadas, bordes excesivamente gruesos o diseños sobrecargados de Material Design. Usar separadores finos de línea (`borderBottomWidth: 1`) para las listas.
-- **Modo Oscuro:** Soporte nativo y limpio utilizando el hook `useColorScheme` y las constantes de `constants/theme.ts`.
+- **Estilo Visual:** Diseño estrictamente plano, limpio y minimalista, inspirado fielmente en la interfaz de "Microsoft To-Do".
+- **Estructura:** Fondo gris claro (`#F3F2F1`), tarjetas blancas redondeadas sin sombras pronunciadas ni elevaciones exageradas de Material Design. Usar separadores finos de línea (`borderBottomWidth: 1`) para las listas.
+- **Modo Oscuro:** Soporte nativo utilizando el hook `useColorScheme` y las constantes de `constants/theme.ts`.
 
 ## Buenas Prácticas y TypeScript
 - Mantener tipados estrictos basados en las uniones de `AnyNote`, `Note`, `ChecklistNote` e `IdeaNote` definidas en `types/index.ts`.
 - Utilizar siempre las funciones de validación de tipos (Type Guards) como `isNote`, `isChecklistNote` e `isIdeaNote` al filtrar o renderizar listas de elementos.
-- Para listas con scroll, priorizar el uso de `<FlashList />` de `@shopify/flash-list` especificando siempre de forma obligatoria la propiedad `estimatedItemSize`.
-- Mantener las rutas de importación relativas limpias y bien estructuradas.
+- Para listas con scroll, priorizar de forma obligatoria el uso de `<FlashList />` de `@shopify/flash-list` especificando siempre la propiedad `estimatedItemSize`.
+- Mantener las rutas de importación relativas limpias y estructuradas usando los alias definidos en `tsconfig.json` (`@/*`).

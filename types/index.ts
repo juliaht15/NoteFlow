@@ -1,15 +1,29 @@
-export interface Note {
+export interface BaseNote {
   id: string;
   title: string;
-  content: string;
-  type: 'note' | 'idea' | 'checklist'; // 👈 Asegúrate de que esta línea exista
   createdAt: string;
   updatedAt: string;
 }
 
-export interface ChecklistNote extends Note {
-  list: { id: string; text: string; done: boolean }[];
+export interface Note extends BaseNote {
+  type: 'note';
+  content: string;
 }
 
-// Si usas un tipo unión para mapear tus notas:
-export type AnyNote = Note | ChecklistNote;
+export interface ChecklistItem {
+  id: string;
+  text: string;
+  done: boolean;
+}
+
+export interface ChecklistNote extends BaseNote {
+  type: 'checklist';
+  list: ChecklistItem[];
+}
+
+export interface IdeaNote extends BaseNote {
+  type: 'idea';
+  content: string;
+}
+
+export type AnyNote = Note | ChecklistNote | IdeaNote;

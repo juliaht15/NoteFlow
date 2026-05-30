@@ -4,7 +4,8 @@ import { Text } from 'react-native-paper';
 import { useRouter } from 'expo-router';
 import * as Haptics from 'expo-haptics';
 import { useNotesStore } from '../store/notesStore';
-import { Colors, Spacing, BorderRadius } from '../constants/theme';
+import { AnyNote } from '../types';
+import { Colors, Spacing } from '../constants/theme';
 
 export default function NuevaNotaScreen() {
   const router = useRouter();
@@ -22,22 +23,22 @@ export default function NuevaNotaScreen() {
       return;
     }
 
-    // Creamos una nota de texto plana estándar compatible con el store
-    const newNote = {
-      id: Date.now().toString(),
+    const newNoteData: AnyNote = {
+      id: Math.random().toString(36).substring(7),
+      type: 'note',
       title: title.trim() || 'Nota sin título',
       content: content.trim(),
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };
 
-    addNote(newNote);
+    addNote(newNoteData);
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     router.back();
   };
 
   return (
-    <ScrollView style={[styles.container, { backgroundColor: currentTheme.background }]} contentContainerStyle={styles.content}>
+    <ScrollView style={[styles.container, { backgroundColor: currentTheme.surface }]} contentContainerStyle={styles.content}>
       <View style={styles.header}>
         <Pressable onPress={() => router.back()} style={styles.backButton}>
           <Text style={{ color: currentTheme.primary, fontSize: 16 }}>Cancelar</Text>
@@ -77,6 +78,6 @@ const styles = StyleSheet.create({
   backButton: { paddingVertical: Spacing.xs },
   saveButton: { paddingVertical: Spacing.xs },
   headerTitle: { fontSize: 18, fontWeight: '600' },
-  titleInput: { fontSize: 24, fontWeight: '700', paddingHorizontal: Spacing.lg, marginBottom: Spacing.md, borderBottomWidth: 0 },
+  titleInput: { fontSize: 24, fontWeight: '700', paddingHorizontal: Spacing.lg, marginBottom: Spacing.md },
   contentInput: { fontSize: 16, paddingHorizontal: Spacing.lg, flex: 1, minHeight: 200, lineHeight: 22 }
 });

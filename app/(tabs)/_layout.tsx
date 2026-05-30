@@ -11,7 +11,6 @@ export default function TabsLayout() {
   return (
     <Tabs 
       screenOptions={{ 
-        // Colores de interacción dinámicos según el modo del sistema
         tabBarActiveTintColor: currentTheme.primary,
         tabBarInactiveTintColor: currentTheme.textSecondary,
         tabBarStyle: {
@@ -24,7 +23,6 @@ export default function TabsLayout() {
           paddingBottom: Platform.OS === 'ios' ? 30 : 12,
           paddingTop: 8,
         },
-        // Ocultamos la cabecera superior nativa para lucir los títulos integrados en el lienzo
         headerShown: false 
       }}
     >
@@ -37,6 +35,7 @@ export default function TabsLayout() {
           ),
         }}
       />
+      
       <Tabs.Screen
         name="checklists"
         options={{
@@ -46,6 +45,7 @@ export default function TabsLayout() {
           ),
         }}
       />
+      
       <Tabs.Screen
         name="ideas"
         options={{
@@ -53,14 +53,6 @@ export default function TabsLayout() {
           tabBarIcon: ({ color, size }) => (
             <MaterialCommunityIcons name="lightbulb-on-outline" size={size || 24} color={color} />
           ),
-        }}
-      />
-      
-      {/* Ocultamos de la barra la pestaña dinámica del detalle de nota */}
-      <Tabs.Screen
-        name="[id]"
-        options={{
-          href: null,
         }}
       />
     </Tabs>

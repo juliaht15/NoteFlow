@@ -7,17 +7,17 @@ import { Colors, Spacing, BorderRadius, Layout } from '../../constants/theme';
 import { useNotesStore } from '../../store/notesStore';
 
 interface ChecklistCardProps {
-  checklist: ChecklistNote;
+  list: ChecklistNote;
   onPress: () => void;
 }
 
-export default function ChecklistCard({ checklist, onPress }: ChecklistCardProps) {
+export default function ChecklistCard({ list, onPress }: ChecklistCardProps) {
   const colorScheme = useColorScheme();
   const currentTheme = colorScheme === 'dark' ? Colors.dark : Colors.light;
   const deleteNote = useNotesStore((state) => state.deleteNote);
 
-  const items = Array.isArray(checklist.items) ? checklist.items : [];
-  const completedCount = items.filter(i => i.isCompleted).length;
+  const items = Array.isArray(list.list) ? list.list : [];
+  const completedCount = items.filter(i => i.done).length;
   const isAllCompleted = items.length > 0 && completedCount === items.length;
 
   const handleDelete = () => {
@@ -29,7 +29,7 @@ export default function ChecklistCard({ checklist, onPress }: ChecklistCardProps
         { text: "Cancelar", style: "cancel" },
         { 
           text: "Eliminar", 
-          onPress: () => deleteNote(checklist.id), 
+          onPress: () => deleteNote(list.id), 
           style: "destructive" 
         }
       ]
@@ -48,33 +48,30 @@ export default function ChecklistCard({ checklist, onPress }: ChecklistCardProps
       <Pressable 
         style={({ pressed }) => [
           styles.pressableRow,
-          pressed && { backgroundColor: currentTheme.overlay }
+          pressed && { backgroundColor: currentTheme.overlay || 'rgba(0,0,0,0.05)' }
         ]}
         onPress={() => {
           Haptics.selectionAsync();
           onPress();
         }}
       >
-        {/* Selector circular dinámico tipo Checkbox a la izquierda */}
         <View 
           style={[
             styles.circularCheckbox, 
-            { borderColor: isAllCompleted ? currentTheme.success : currentTheme.textSecondary },
-            isAllCompleted && { backgroundColor: currentTheme.success }
+            { borderColor: isAllCompleted ? (currentTheme.success || '#107C41') : currentTheme.textSecondary },
+            isAllCompleted && { backgroundColor: (currentTheme.success || '#107C41') }
           ]}
         >
           {isAllCompleted && (
-            <Text style={[styles.checkMark, { color: Colors.light.surface }]}>✓</Text>
+            <Text style={[styles.checkMark, { color: '#FFFFFF' }]}>✓</Text>
           )}
         </View>
 
-        {/* Bloque central de la lista de tareas */}
         <View style={styles.centerContent}>
           <Text style={[styles.title, { color: currentTheme.text }]} numberOfLines={1}>
-            {checklist.title || 'Lista sin título'}
+            {list.title || 'Lista sin título'}
           </Text>
 
-          {/* Subdatos: Tareas completadas y fecha */}
           <View style={styles.metaRow}>
             <Text style={[styles.metaText, { color: currentTheme.textSecondary }]}>
               {items.length === 0 
@@ -84,12 +81,11 @@ export default function ChecklistCard({ checklist, onPress }: ChecklistCardProps
             </Text>
             <Text style={[styles.bulletSeparator, { color: currentTheme.textSecondary }]}>•</Text>
             <Text style={[styles.metaText, { color: currentTheme.textSecondary }]}>
-              {formatDate(checklist.updatedAt)}
+              {formatDate(list.updatedAt)}
             </Text>
           </View>
         </View>
 
-        {/* Borrado limpio a la derecha */}
         <IconButton 
           icon="delete-outline" 
           size={18} 
@@ -99,7 +95,6 @@ export default function ChecklistCard({ checklist, onPress }: ChecklistCardProps
         />
       </Pressable>
 
-      {/* Separador fluido que arranca alineado con el texto */}
       <View style={[styles.separator, { backgroundColor: currentTheme.border }]} />
     </View>
   );
@@ -157,7 +152,7 @@ const styles = StyleSheet.create({
     opacity: 0.6,
   },
   separator: {
-    height: Layout.separatorHeight,
-    marginLeft: Spacing.lg + 20 + Spacing.md, // Oculte el checkbox del separador inferior
+    height: Layout?.separatorHeight || 1,
+    marginLeft: Spacing.lg + 20 + Spacing.md,
   }
 });

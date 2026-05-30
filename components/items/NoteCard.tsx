@@ -44,14 +44,13 @@ export default function NoteCard({ note, onPress }: NoteCardProps) {
       <Pressable 
         style={({ pressed }) => [
           styles.pressableRow,
-          pressed && { backgroundColor: currentTheme.overlay }
+          pressed && { backgroundColor: currentTheme.overlay || 'rgba(0,0,0,0.05)' }
         ]}
         onPress={() => {
           Haptics.selectionAsync();
           onPress();
         }}
       >
-        {/* Icono de ancla a la izquierda que mantiene la simetría con los checkboxes circulares */}
         <View style={styles.iconContainer}>
           <IconButton 
             icon="note-text-outline" 
@@ -61,7 +60,6 @@ export default function NoteCard({ note, onPress }: NoteCardProps) {
           />
         </View>
 
-        {/* Bloque central del contenido de la nota */}
         <View style={styles.centerContent}>
           <Text style={[styles.title, { color: currentTheme.text }]} numberOfLines={1}>
             {note.title || 'Nota sin título'}
@@ -78,7 +76,6 @@ export default function NoteCard({ note, onPress }: NoteCardProps) {
           </Text>
         </View>
 
-        {/* Borrado limpio a la derecha */}
         <IconButton 
           icon="delete-outline" 
           size={18} 
@@ -88,7 +85,6 @@ export default function NoteCard({ note, onPress }: NoteCardProps) {
         />
       </Pressable>
 
-      {/* Separador de un píxel físico exacto */}
       <View style={[styles.separator, { backgroundColor: currentTheme.border }]} />
     </View>
   );
@@ -139,7 +135,7 @@ const styles = StyleSheet.create({
     opacity: 0.6,
   },
   separator: {
-    height: Layout.separatorHeight,
-    marginLeft: Spacing.lg + 20 + Spacing.md, // Mantiene la alineación de sangría matemática exacta de las otras filas
+    height: Layout?.separatorHeight || 1,
+    marginLeft: Spacing.lg + 20 + Spacing.md,
   }
 });

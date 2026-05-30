@@ -3,50 +3,10 @@
     "name": "noteflow",
     "slug": "noteflow",
     "version": "1.0.0",
-    "orientation": "portrait",
-    "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
-    "newArchEnabled": true,
+    "icon": "./assets/icon.png", 
     "splash": {
-      "image": "./assets/splash-icon.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
-    },
-    "ios": {
-      "supportsTablet": true,
-      "bundleIdentifier": "com.julia.noteflow",
-      "infoPlist": {
-        "ITSAppUsesNonExemptEncryption": false
-      }
-    },
-    "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
-      },
-      "package": "com.julia.noteflow"
-    },
-    "web": {
-      "favicon": "./assets/favicon.png"
-    },
-    "plugins": [
-      "expo-router"
-    ],
-    "experiments": {
-      "typedRoutes": true
-    },
-    "runtimeVersion": "1.0.0",
-    "extra": {
-      "eas": {
-        "projectId": "54b70d35-3f44-4720-9b03-68f2fedb30df"
-      },
-      "router": {
-        "origin": false
-      }
-    },
-    "owner": "juliaht15",
-    "updates": {
-      "url": "https://u.expo.dev/54b70d35-3f44-4720-9b03-68f2fedb30df"
+      "image": "./assets/splash.png",
+      "resizeMode": "contain"
     }
   }
 }
