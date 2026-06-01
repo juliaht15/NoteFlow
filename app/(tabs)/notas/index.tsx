@@ -3,17 +3,17 @@ import { StyleSheet, View } from 'react-native';
 import { Searchbar, FAB, Text } from 'react-native-paper';
 import { FlashList } from '@shopify/flash-list';
 import { useRouter } from 'expo-router';
-import { useNotesStore } from '../../store/notesStore';
-import { Note } from '../../types';
-import NoteCard from '../../components/items/NoteCard';
+import { useNotesStore } from '@/store/notesStore';
+import type { Note } from '@/types';
+import NoteCard from '@/components/items/NoteCard';
 
-export default function NotesScreen() {
+export default function NotasScreen() {
   const router = useRouter();
-  const [search, setSearch] = useState('');
+  const [search, setSearch] = useState<string>('');
   const allNotes = useNotesStore((state) => state.notes);
 
   const filtered = useMemo(() => 
-    allNotes.filter((n): n is Note => 
+    allNotes.filter((n: Note) => 
       n.type === 'note' && n.title.toLowerCase().includes(search.toLowerCase())
     ), [allNotes, search]);
 
@@ -28,14 +28,14 @@ export default function NotesScreen() {
       
       <FlashList
         data={filtered}
-        renderItem={({ item }) => (
+        renderItem={({ item }: { item: Note }) => (
           <NoteCard 
             note={item} 
-            onPress={() => router.push(`/(tabs)/${item.id}` as any)} 
+            onPress={() => router.push(`/(tabs)/notas/${item.id}` as any)} 
           />
         )}
-        keyExtractor={(item) => item.id}
-        estimatedItemSize={80 as any}
+        keyExtractor={(item: Note) => item.id}
+        estimatedItemSize={80}
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
             <Text>No hay notas de texto</Text>
