@@ -1,7 +1,7 @@
 export interface Note {
-  id: string;
+  id?: string;
   title: string;
   content: string;
   type: 'note' | 'idea' | 'checklist';
-  createdAt: number;
+  created_at?: string;
 }

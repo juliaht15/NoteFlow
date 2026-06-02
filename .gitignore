@@ -52,3 +52,7 @@ lerna-debug.log*
 
 # Archivos generados por Expo CLI
 expo-env.d.ts
+
+# Dependencias Backend
+api/node_modules/
+api/dist/

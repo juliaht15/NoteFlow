@@ -1,20 +1,24 @@
+import { PaperProvider, MD3LightTheme } from 'react-native-paper';
 import { Stack } from 'expo-router';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { Colors } from '@/constants/theme';
+
+const theme = {
+  ...MD3LightTheme,
+  colors: {
+    ...MD3LightTheme.colors,
+    primary: Colors.primary,
+    background: Colors.background,
+    surface: Colors.surface,
+  },
+};
 
 export default function RootLayout() {
   return (
-    <SafeAreaProvider>
-      <Stack screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen 
-          name="nueva-nota" 
-          options={{ 
-            presentation: 'modal',
-            headerShown: true,
-            title: 'Nueva Nota'
-          }} 
-        />
-      </Stack>
-    </SafeAreaProvider>
+    <PaperProvider theme={theme}>
+      <Stack screenOptions={{ 
+        headerShown: false,
+        contentStyle: { backgroundColor: Colors.background }
+      }} />
+    </PaperProvider>
   );
 }
