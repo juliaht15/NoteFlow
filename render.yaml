@@ -1,9 +1,0 @@
-services:
-  - type: web
-    name: noteflow-api
-    rootDir: api
-    buildCommand: npm install && npm run build
-    startCommand: npm run start
-    envVars:
-      - key: DATABASE_URL
-        fromGroup: noteflow-db-group

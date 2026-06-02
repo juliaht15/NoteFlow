@@ -1,58 +1,41 @@
-# Dependencias
+# Learn more https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files
+
+# dependencies
 node_modules/
+
+# Expo
 .expo/
-.expo-shared/
-
-# Construcción y Distribución
 dist/
-build/
-*.jks
-*.keystore
-*.p12
-*.pem
-*.apk
-*.aab
-*.ipa
-
-# IDE y Editores
-.idea/
-*.swp
-*.swo
-*~
-.DS_Store
-
-# Permitir configuración de Cursor y VS Code en equipo
-!.vscode/
-!.cursorrules
-
-# Logs y Debugging
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-lerna-debug.log*
-.pnpm-debug.log*
-
-# Entorno y Secretos (Seguridad)
-.env
-.env.local
-.env.production
-.env.development
-!.env.example
-
-# TypeScript y Caché
-*.tsbuildinfo
-.ts-node/
-
-# Expo Updates & OTA
-.expo/updates/
-
-# Cursor & Reglas de IA
-.cursor/
-.cursorrules.bak
-
-# Archivos generados por Expo CLI
+web-build/
 expo-env.d.ts
 
-# Dependencias Backend
-api/node_modules/
-api/dist/
+# Native
+.kotlin/
+*.orig.*
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+
+# Metro
+.metro-health-check*
+
+# debug
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+
+# macOS
+.DS_Store
+*.pem
+
+# local env files
+.env*.local
+
+# typescript
+*.tsbuildinfo
+
+# generated native folders
+/ios
+/android
