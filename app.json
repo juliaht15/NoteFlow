@@ -12,7 +12,10 @@
     "sdkVersion": "50.0.0",
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.juliaht15.noteflow"
+      "bundleIdentifier": "com.juliaht15.noteflow",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -29,6 +32,17 @@
     },
     "plugins": [
       "expo-router"
-    ]
+    ],
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "54b70d35-3f44-4720-9b03-68f2fedb30df"
+      }
+    },
+    "updates": {
+      "url": "https://u.expo.dev/54b70d35-3f44-4720-9b03-68f2fedb30df"
+    }
   }
 }
