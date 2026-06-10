@@ -1,0 +1,27 @@
+# NoteFlow Project Rules
+
+## Architecture & Principles
+- **Feature-first approach**: Organize logic and UI by feature (e.g., app/notas, app/checklists) rather than purely by file type.
+- **Layered structure**: Maintain separation of concerns between `app/` (routing), `components/` (reusable UI), `store/` (state logic), `types/` (interfaces), and `services/` (API/storage).
+- **TypeScript strictness**: Enable strict mode; always define types for props, states, and API responses. No `any` types.
+
+## Design System (Microsoft To Do Style)
+- **Visual Language**: Clean, minimalist, white space-focused.
+- **Typography**: Clear sans-serif, high legibility.
+- **UI Library**: Use **Gluestack UI** for all base components to ensure consistency, accessibility, and theme support (light/dark).
+- **Theming**: Implement design tokens in `constants/theme.ts`.
+
+## Tech Stack & Conventions
+- **Routing**: Expo Router (file-based).
+- **State**: Zustand for global state.
+- **Performance**: FlashList for all lists (provide estimatedItemSize).
+- **Forms**: Zod for validation.
+- **Naming**: 
+  - Components: PascalCase.
+  - Functions/Variables: camelCase.
+  - File names: Match component/feature names (e.g., `NoteCard.tsx`, `useNotesStore.ts`).
+
+## Quality Requirements
+- **Documentation**: Keep `docs/` updated.
+- **UI Consistency**: Every screen must follow the defined design system.
+- **Performance**: Zero white screens on scroll; efficient state management to avoid unnecessary re-renders.
