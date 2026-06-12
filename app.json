@@ -4,6 +4,13 @@
     "slug": "noteflow",
     "version": "1.0.0",
     "scheme": "noteflow",
+    "android": {
+      "package": "com.noteflow.app",
+      "googleServicesFile": "./google-services.json"
+    },
+    "ios": {
+      "bundleIdentifier": "com.noteflow.app"
+    },
     "plugins": [
       "expo-router"
     ],

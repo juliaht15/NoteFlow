@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "643323256725",
+    "project_id": "noteflow-jht",
+    "storage_bucket": "noteflow-jht.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:643323256725:android:ba9bb4d3cdb355a280209c",
+        "android_client_info": {
+          "package_name": "com.noteflow.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBx9JPF-KuHnadpvjjaPHDubX59vs-W5Iw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
