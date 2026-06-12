@@ -1,6 +1,6 @@
-import { AnyNote } from '../../types';
+import { AnyNote } from '../../types'; // Ajusta según tu estructura
 
-const API_URL = 'http://localhost:3000/api'; // Cambia esto al desplegar
+const API_URL = 'http://localhost:3000/api';
 
 export const api = {
   createNote: async (data: Omit<AnyNote, 'id' | 'createdAt' | 'updatedAt'>): Promise<AnyNote> => {
@@ -11,12 +11,6 @@ export const api = {
     });
 
     if (!response.ok) throw new Error('Error al crear la nota');
-    return response.json();
-  },
-
-  getNotes: async (): Promise<AnyNote[]> => {
-    const response = await fetch(`${API_URL}/notes`);
-    if (!response.ok) throw new Error('Error al obtener notas');
     return response.json();
   }
 };

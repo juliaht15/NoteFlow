@@ -1,10 +1,8 @@
-import { neon } from '@neondatabase/serverless';
+import { neon, NeonQueryFunction } from '@neondatabase/serverless';
 
-// Inicializamos el cliente
-const sql = neon(process.env.DATABASE_URL!);
+// Inicialización segura de la conexión
+const sql: NeonQueryFunction<false, false> = neon(process.env.DATABASE_URL!);
 
-// Usamos el tipo correcto para los parámetros de Neon
-export async function query(text: string, params: (string | number | boolean | null)[] = []) {
-  // Ejecutamos la consulta. 'as any' silencia el error de TypeScript sobre TemplateStringsArray
-  return await (sql as any)(text, params);
+export async function query<T>(text: string, params: (string | number | boolean | null)[] = []) {
+  return await sql(text, params) as T[];
 }
