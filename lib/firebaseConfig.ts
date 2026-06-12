@@ -1,17 +1,22 @@
-// E:\Proyectos\noteflow\lib\firebaseConfig.ts
 import { initializeApp } from 'firebase/app';
-import { getAuth } from 'firebase/auth';
+import { initializeAuth, getReactNativePersistence } from 'firebase/auth/react-native';
+import ReactNativeAsyncStorage from '@react-native-async-storage/async-storage';
 import { getFirestore } from 'firebase/firestore';
 
 const firebaseConfig = {
-  apiKey: "TU_API_KEY_DE_FIREBASE_CONSOLE",
+  apiKey: "AIzaSyBx9JPF-KuHnadpvjjaPHDubX59vs-W5Iw",
   authDomain: "noteflow-jht.firebaseapp.com",
   projectId: "noteflow-jht",
-  storageBucket: "noteflow-jht.appspot.com",
-  messagingSenderId: "643323256725",
-  appId: "..." 
+  storageBucket: "noteflow-jht.firebasestorage.app",
+  appId: "1:643323256725:android:ba9bb4d3cdb355a280209c"
 };
 
 const app = initializeApp(firebaseConfig);
-export const auth = getAuth(app);
-export const db = getFirestore(app);
+
+const auth = initializeAuth(app, {
+  persistence: getReactNativePersistence(ReactNativeAsyncStorage)
+});
+
+const db = getFirestore(app);
+
+export { auth, db };
