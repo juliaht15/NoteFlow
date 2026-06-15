@@ -22,6 +22,7 @@
     "@shopify/flash-list": "2.0.2",
     "expo": "~54.0.34",
     "expo-constants": "~18.0.13",
+    "expo-image-picker": "~17.0.11",
     "expo-linking": "~8.0.12",
     "expo-router": "~6.0.24",
     "expo-status-bar": "~3.0.9",
@@ -41,5 +42,16 @@
     "babel-plugin-module-resolver": "^5.0.3",
     "typescript": "~5.9.2"
   },
-  "private": true
+  "private": true,
+
+  "expo": {
+    "plugins": [
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "La app necesita acceso a tus fotos para subir tu avatar."
+        }
+      ]
+    ]
+  }
 }
