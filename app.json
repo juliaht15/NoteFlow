@@ -1,5 +1,6 @@
 {
   "expo": {
+    "scheme": "noteflow",
     "name": "noteflow",
     "slug": "noteflow",
     "android": {
