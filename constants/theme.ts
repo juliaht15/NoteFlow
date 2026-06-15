@@ -1,4 +1,4 @@
-// E:\Proyectos\noteflow\constants\theme.ts
+import { useColorScheme } from 'react-native';
 
 export const COLORS = {
   light: {
@@ -19,31 +19,17 @@ export const COLORS = {
   },
 };
 
-export const SPACING = {
-  xs: 4,
-  sm: 8,
-  md: 16,
-  lg: 24,
-  xl: 32,
-};
-
+export const SPACING = { xs: 4, sm: 8, md: 16, lg: 24, xl: 32 };
 export const TYPOGRAPHY = {
-  fontSize: {
-    xs: 12,
-    sm: 14,
-    md: 16,
-    lg: 20,
-    xl: 24,
-  },
-  fontWeight: {
-    regular: '400' as const, // Forzamos el tipo para que sea compatible con react-native
-    bold: '700' as const,
-  },
+  fontSize: { xs: 12, sm: 14, md: 16, lg: 20, xl: 24 },
+  fontWeight: { regular: '400' as const, bold: '700' as const },
 };
 
-// Accesibilidad: exportamos un objeto para usar fácilmente en StyleSheet
-export const theme = {
-  colors: COLORS.light, // Por defecto usamos light
-  spacing: SPACING,
-  typography: TYPOGRAPHY,
+export const useTheme = () => {
+  const scheme = useColorScheme();
+  return {
+    colors: COLORS[scheme === 'dark' ? 'dark' : 'light'],
+    spacing: SPACING,
+    typography: TYPOGRAPHY,
+  };
 };

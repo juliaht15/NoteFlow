@@ -19,7 +19,7 @@
     "@gluestack-ui/themed": "^1.1.73",
     "@neondatabase/serverless": "^1.1.0",
     "@react-native-async-storage/async-storage": "^2.2.0",
-    "@shopify/flash-list": "2.0.2",
+    "@shopify/flash-list": "^2.0.2",
     "expo": "~54.0.34",
     "expo-constants": "~18.0.13",
     "expo-image-picker": "~17.0.11",
@@ -43,7 +43,6 @@
     "typescript": "~5.9.2"
   },
   "private": true,
-
   "expo": {
     "plugins": [
       [

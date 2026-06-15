@@ -28,8 +28,8 @@ export const AddNoteForm = () => {
       title,
       content,
       type: 'note',
-      createdAt: new Date(), // Ajustado al tipo Date si es necesario
-      updatedAt: new Date(),
+      createdAt: new Date().toISOString(), // Cambio importante
+      updatedAt: new Date().toISOString(),
     });
 
     setError(null);

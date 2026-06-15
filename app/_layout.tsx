@@ -1,9 +1,8 @@
 // E:\Proyectos\noteflow\app\_layout.tsx
 import { useEffect, useState } from 'react';
-import { Stack } from 'expo-router';
+import { Stack, useRouter, useSegments } from 'expo-router';
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from '../lib/firebaseConfig';
-import { useRouter, useSegments } from 'expo-router';
 
 export default function RootLayout() {
   const [initializing, setInitializing] = useState(true);
@@ -12,18 +11,17 @@ export default function RootLayout() {
   const segments = useSegments();
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+    return onAuthStateChanged(auth, (user) => {
       setUser(user);
-      if (initializing) setInitializing(false);
+      setInitializing(false);
     });
-    return unsubscribe;
   }, []);
 
   useEffect(() => {
     if (initializing) return;
 
     const inTabsGroup = segments[0] === '(tabs)';
-
+    
     if (!user && !inTabsGroup && segments[0] !== 'register') {
       router.replace('/register');
     } else if (user && segments[0] !== '(tabs)') {

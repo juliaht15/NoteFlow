@@ -1,5 +1,5 @@
 import { useNotesStore } from '@/store/useNoteStore';
-import { AnyNote } from '@/app/(tabs)';
+import { AnyNote } from '@/types';
 
 export const useCreateNote = () => {
   const { addNote, addChecklist, addIdea } = useNotesStore();
