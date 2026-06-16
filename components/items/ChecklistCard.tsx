@@ -1,26 +1,30 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { ChecklistNote } from '@/types';
+import { useTheme } from '@/constants/theme';
 
 export const ChecklistCard = ({ note }: { note: ChecklistNote }) => {
-  // Ajuste: Cambiamos 'isCompleted' por 'checked' basado en tu mensaje de error
+  const { colors } = useTheme();
   const completed = note.items.filter(i => i.checked).length;
   const progress = note.items.length > 0 ? (completed / note.items.length) * 100 : 0;
 
   return (
-    <View style={styles.card}>
-      <Text style={styles.title}>{note.title}</Text>
-      <Text>{completed}/{note.items.length} completados</Text>
-      <View style={styles.progressBar}>
-        <View style={[styles.progress, { width: `${progress}%` }]} />
+    <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+      <Text style={[styles.title, { color: colors.text }]}>{note.title}</Text>
+      <Text style={[styles.info, { color: colors.secondaryText }]}>
+        {completed}/{note.items.length} completados
+      </Text>
+      <View style={[styles.progressBar, { backgroundColor: colors.border }]}>
+        <View style={[styles.progress, { width: `${progress}%`, backgroundColor: colors.primary }]} />
       </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  card: { padding: 15, backgroundColor: '#f9f9f9', borderRadius: 10, marginVertical: 5 },
-  title: { fontSize: 18, fontWeight: 'bold' },
-  progressBar: { height: 8, backgroundColor: '#eee', marginTop: 5, borderRadius: 4 },
-  progress: { height: 8, backgroundColor: '#4CAF50', borderRadius: 4 }
+  card: { padding: 16, borderRadius: 8, borderWidth: 1 },
+  title: { fontSize: 16, fontWeight: '700', marginBottom: 4 },
+  info: { fontSize: 13, marginBottom: 8 },
+  progressBar: { height: 6, borderRadius: 3, overflow: 'hidden' },
+  progress: { height: 6 }
 });

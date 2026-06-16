@@ -1,9 +1,8 @@
-// E:\Proyectos\noteflow\hooks\useLocation.ts
 import { useState } from 'react';
 import * as Location from 'expo-location';
 
 export const useLocation = () => {
-  const [location, setLocation] = useState<{ latitude: number; longitude: number } | null>(null);
+  const [location, setLocation] = useState<{ lat: number; lng: number } | null>(null);
 
   const getCurrentLocation = async () => {
     try {
@@ -14,8 +13,8 @@ export const useLocation = () => {
       }
       const loc = await Location.getCurrentPositionAsync({});
       const coords = {
-        latitude: loc.coords.latitude,
-        longitude: loc.coords.longitude,
+        lat: loc.coords.latitude,
+        lng: loc.coords.longitude,
       };
       setLocation(coords);
       return coords;

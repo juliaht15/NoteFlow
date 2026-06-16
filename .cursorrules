@@ -6,9 +6,9 @@
 - **TypeScript strictness**: Enable strict mode; always define types for props, states, and API responses. No `any` types.
 
 ## Design System (Microsoft To Do Style)
-- **Visual Language**: Clean, minimalist, white space-focused.
+- **Visual Language**: Clean, minimalist, dark-theme focused.
 - **Typography**: Clear sans-serif, high legibility.
-- **UI Library**: Use **Gluestack UI** for all base components to ensure consistency, accessibility, and theme support (light/dark).
+- **UI Library**: Use **React Native Paper** for all base UI components to ensure consistency, accessibility, and MD3 compliance.
 - **Theming**: Implement design tokens in `constants/theme.ts`.
 
 ## Tech Stack & Conventions
@@ -16,12 +16,3 @@
 - **State**: Zustand for global state.
 - **Performance**: FlashList for all lists (provide estimatedItemSize).
 - **Forms**: Zod for validation.
-- **Naming**: 
-  - Components: PascalCase.
-  - Functions/Variables: camelCase.
-  - File names: Match component/feature names (e.g., `NoteCard.tsx`, `useNotesStore.ts`).
-
-## Quality Requirements
-- **Documentation**: Keep `docs/` updated.
-- **UI Consistency**: Every screen must follow the defined design system.
-- **Performance**: Zero white screens on scroll; efficient state management to avoid unnecessary re-renders.

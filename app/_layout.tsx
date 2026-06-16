@@ -1,50 +1,70 @@
-import { useEffect, useState } from 'react';
-import { Stack, useRouter, useSegments } from 'expo-router';
-import { onAuthStateChanged, User } from 'firebase/auth';
-import { auth } from '../lib/firebaseConfig';
-import { PaperProvider, MD3LightTheme, MD3DarkTheme } from 'react-native-paper';
-import { useColorScheme } from 'react-native';
+import { Tabs } from 'expo-router';
+import { useTheme } from '../constants/theme';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
-export default function RootLayout() {
-  const [initializing, setInitializing] = useState(true);
-  const [user, setUser] = useState<User | null>(null);
-  const router = useRouter();
-  const segments = useSegments();
-  
-  // Detectar el esquema de color del sistema (claro/oscuro)
-  const colorScheme = useColorScheme();
-  const isDark = colorScheme === 'dark';
-  const theme = isDark ? MD3DarkTheme : MD3LightTheme;
-
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setUser(user);
-      setInitializing(false);
-    });
-    return unsubscribe;
-  }, []);
-
-  useEffect(() => {
-    if (initializing) return;
-
-    const inTabsGroup = segments[0] === '(tabs)';
-    
-    if (!user && !inTabsGroup && segments[0] !== 'register') {
-      router.replace('/register');
-    } else if (user && segments[0] !== '(tabs)') {
-      router.replace('/(tabs)');
-    }
-  }, [user, initializing, segments]);
+export default function TabsLayout() {
+  const { colors } = useTheme();
 
   return (
-    <PaperProvider theme={theme}>
-      <Stack screenOptions={{ 
-        headerShown: false,
-        contentStyle: { backgroundColor: theme.colors.background } // Color de fondo adaptativo
-      }}>
-        <Stack.Screen name="(tabs)" />
-        <Stack.Screen name="register" />
-      </Stack>
-    </PaperProvider>
+    <Tabs
+      screenOptions={{
+        tabBarActiveTintColor: colors.primary,
+        tabBarInactiveTintColor: colors.secondaryText,
+        tabBarStyle: {
+          backgroundColor: colors.surface,
+          borderTopColor: colors.border,
+          height: 60,
+          paddingBottom: 8,
+        },
+        headerStyle: {
+          backgroundColor: colors.surface,
+        },
+        headerTintColor: colors.text,
+      }}
+    >
+      <Tabs.Screen
+        name="index"
+        options={{
+          title: 'Inicio',
+          tabBarIcon: ({ color, size }) => (
+            <MaterialCommunityIcons name="home" color={color} size={size} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="notas/index"
+        options={{
+          title: 'Notas',
+          tabBarIcon: ({ color, size }) => (
+            <MaterialCommunityIcons name="file-document" color={color} size={size} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="checklists/index"
+        options={{
+          title: 'Checklist',
+          tabBarIcon: ({ color, size }) => (
+            <MaterialCommunityIcons name="checkbox-marked" color={color} size={size} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="ideas/index"
+        options={{
+          title: 'Ideas',
+          tabBarIcon: ({ color, size }) => (
+            <MaterialCommunityIcons name="lightbulb" color={color} size={size} />
+          ),
+        }}
+      />
+
+      {/* Ocultamos las subrutas dinámicas para que no rompan el diseño de la barra inferior */}
+      <Tabs.Screen name="notas/[id]" options={{ href: null }} />
+      <Tabs.Screen name="checklists/[id]" options={{ href: null }} />
+      <Tabs.Screen name="ideas/[id]" options={{ href: null }} />
+      <Tabs.Screen name="register" options={{ href: null }} />
+      <Tabs.Screen name="login" options={{ href: null }} />
+    </Tabs>
   );
 }

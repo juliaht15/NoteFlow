@@ -1,17 +1,25 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { IdeaNote } from '@/types';
+import { useTheme } from '@/constants/theme';
 
-export const IdeaCard = ({ note }: { note: IdeaNote }) => (
-  <View style={[styles.card, { backgroundColor: note.color || '#6200EE' }]}>
-    <Text style={styles.title}>{note.title}</Text>
-    <View style={styles.tags}>{note.tags.map(t => <Text key={t} style={styles.tag}>#{t}</Text>)}</View>
-  </View>
-);
+export const IdeaCard = ({ note }: { note: IdeaNote }) => {
+  const { colors } = useTheme();
+  return (
+    <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+      <Text style={[styles.title, { color: colors.text }]}>{note.title}</Text>
+      <View style={styles.tags}>
+        {note.tags.map(t => (
+          <Text key={t} style={[styles.tag, { color: colors.primary }]}>#{t}</Text>
+        ))}
+      </View>
+    </View>
+  );
+};
 
 const styles = StyleSheet.create({
-  card: { padding: 15, borderRadius: 10, marginVertical: 5 },
-  title: { fontSize: 18, color: '#fff', fontWeight: 'bold' },
-  tags: { flexDirection: 'row', marginTop: 5 },
-  tag: { color: '#fff', fontSize: 12, marginRight: 5, opacity: 0.8 }
+  card: { padding: 16, borderRadius: 8, borderWidth: 1 },
+  title: { fontSize: 16, fontWeight: '700' },
+  tags: { flexDirection: 'row', flexWrap: 'wrap', marginTop: 8, gap: 6 },
+  tag: { fontSize: 13, fontWeight: '600' }
 });

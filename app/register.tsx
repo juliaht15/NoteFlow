@@ -1,73 +1,96 @@
-// Register.tsx
-import { useState } from 'react';
-import { View, TextInput, Button, Alert, ActivityIndicator, Image } from 'react-native';
+import React, { useState } from 'react';
+import { View, StyleSheet, Alert } from 'react-native';
+import { TextInput, Button, Text } from 'react-native-paper';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../lib/firebaseConfig';
 import { createUserProfile } from '../lib/userService';
-import { uploadProfileImage } from '../lib/storageService'; // Importamos el servicio
+import { uploadProfileImage } from '../lib/storageService';
 import ProfileImagePicker from '../components/ProfileImagePicker';
+import { useTheme } from '../constants/theme';
+import { useRouter } from 'expo-router';
 
-export default function Register() {
+export default function RegisterScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [loading, setLoading] = useState(false);
   const [imageUri, setImageUri] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const { colors } = useTheme();
+  const router = useRouter();
 
   const handleRegister = async () => {
-    if (!email || !password) return Alert.alert('Error', 'Completa todos los campos');
-    
+    if (!email || !password) {
+      Alert.alert('Error', 'Por favor, rellena todos los campos.');
+      return;
+    }
+
     setLoading(true);
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      const uid = userCredential.user.uid;
-      
+      const user = userCredential.user;
+
       let photoUrl = null;
       if (imageUri) {
-        photoUrl = await uploadProfileImage(imageUri, uid);
+        photoUrl = await uploadProfileImage(imageUri, user.uid);
       }
-      
-      // Pasamos photoUrl a tu función de perfil
-      await createUserProfile(uid, email); 
-      // Nota: Asegúrate que createUserProfile en userService.ts acepte photoUrl si quieres guardarla ahí
-      
-      Alert.alert('¡Éxito!', 'Cuenta creada correctamente');
+
+      await createUserProfile(user.uid, user.email!, photoUrl);
+
+      Alert.alert('Éxito', 'Usuario registrado correctamente');
+      router.replace('/');
     } catch (error: any) {
-      Alert.alert('Error', error.message);
+      Alert.alert('Error de registro', error.message);
     } finally {
       setLoading(false);
     }
   };
 
-  return (
-    <View style={{ padding: 20, marginTop: 50 }}>
-      <ProfileImagePicker onImageSelected={(uri) => setImageUri(uri)} />
-      {imageUri && (
-        <Image 
-          source={{ uri: imageUri }} 
-          style={{ width: 100, height: 100, alignSelf: 'center', marginVertical: 10, borderRadius: 50 }} 
-        />
-      )}
+  // Extraemos de forma segura mapeando un color de respaldo si la propiedad exacta falla en el tipado
+  const backgroundColorStyle = (colors as any).background || colors.surface || '#121212';
 
-      <TextInput 
-        placeholder="Email" 
-        onChangeText={setEmail} 
-        value={email} 
-        autoCapitalize="none"
-        style={{ borderWidth: 1, marginBottom: 10, padding: 8 }} 
-      />
-      <TextInput 
-        placeholder="Contraseña" 
-        secureTextEntry 
-        onChangeText={setPassword} 
-        value={password} 
-        style={{ borderWidth: 1, marginBottom: 10, padding: 8 }}
-      />
+  return (
+    <View style={[styles.container, { backgroundColor: backgroundColorStyle }]}>
+      <Text variant="headlineMedium" style={[styles.title, { color: colors.text }]}>
+        Crear Cuenta
+      </Text>
       
-      {loading ? (
-        <ActivityIndicator size="large" />
-      ) : (
-        <Button title="Registrarse" onPress={handleRegister} />
-      )}
+      <ProfileImagePicker onImageSelected={setImageUri} />
+
+      <TextInput
+        label="Email"
+        value={email}
+        onChangeText={setEmail}
+        mode="outlined"
+        autoCapitalize="none"
+        keyboardType="email-address"
+        textColor={colors.text}
+        style={styles.input}
+      />
+      <TextInput
+        label="Contraseña"
+        value={password}
+        onChangeText={setPassword}
+        secureTextEntry
+        mode="outlined"
+        textColor={colors.text}
+        style={styles.input}
+      />
+      <Button
+        mode="contained"
+        onPress={handleRegister}
+        loading={loading}
+        disabled={loading}
+        buttonColor={colors.primary}
+        style={styles.button}
+      >
+        Registrarse
+      </Button>
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: { flex: 1, justifyContent: 'center', padding: 20 },
+  title: { textAlign: 'center', marginBottom: 24, fontWeight: '700' },
+  input: { marginBottom: 14, height: 50 },
+  button: { marginTop: 10, paddingVertical: 4, borderRadius: 8 },
+});

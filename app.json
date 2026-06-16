@@ -1,10 +1,24 @@
 {
   "expo": {
+    "name": "NoteFlow",
+    "slug": "noteflow",
+    "version": "1.0.0",
+    "scheme": "noteflow",
+    "android": {
+      "package": "com.noteflow.app",
+      "googleServicesFile": "./google-services.json"
+    },
     "plugins": [
       [
         "expo-location",
         {
-          "locationAlwaysAndWhenInUsePermission": "Allow $(PRODUCT_NAME) to use your location."
+          "locationAlwaysAndWhenInUsePermission": "Permite que NoteFlow acceda a tu ubicación para geolocalizar tus notas."
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "La app necesita acceso a tus fotos para subir tu avatar."
         }
       ]
     ]

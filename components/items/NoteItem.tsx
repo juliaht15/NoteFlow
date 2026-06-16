@@ -1,17 +1,24 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { AnyNote } from '@/types'; // Cambiado de 'Note' a 'AnyNote'
+import { AnyNote } from '@/types';
+import { useTheme } from '@/constants/theme';
 
-export const NoteItem = ({ note }: { note: AnyNote }) => (
-  <View style={styles.card}>
-    <Text style={styles.title}>{note.title}</Text>
-    {/* Nota: Asegúrate de que AnyNote tenga la propiedad 'content'. 
-        Si es un Checklist, 'content' podría no existir */}
-    {'content' in note && <Text>{note.content}</Text>}
-  </View>
-);
+export const NoteItem = ({ note }: { note: AnyNote }) => {
+  const { colors } = useTheme();
+  return (
+    <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+      <Text style={[styles.title, { color: colors.text }]}>{note.title}</Text>
+      {'content' in note && (
+        <Text style={[styles.content, { color: colors.secondaryText }]} numberOfLines={2}>
+          {note.content}
+        </Text>
+      )}
+    </View>
+  );
+};
 
 const styles = StyleSheet.create({
-  card: { padding: 15, backgroundColor: '#f9f9f9', borderRadius: 10, marginVertical: 5 },
-  title: { fontSize: 18, fontWeight: 'bold' }
+  card: { padding: 16, borderRadius: 8, borderWidth: 1 },
+  title: { fontSize: 16, fontWeight: '700', marginBottom: 4 },
+  content: { fontSize: 14 }
 });
