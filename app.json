@@ -1,11 +1,12 @@
 {
   "expo": {
-    "scheme": "noteflow",
-    "name": "noteflow",
-    "slug": "noteflow",
-    "android": {
-      "package": "com.noteflow.app",
-      "googleServicesFile": "./google-services.json"
-    }
+    "plugins": [
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Allow $(PRODUCT_NAME) to use your location."
+        }
+      ]
+    ]
   }
 }

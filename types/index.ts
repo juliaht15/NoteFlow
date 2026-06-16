@@ -3,31 +3,25 @@
 export interface BaseNote {
   id: string;
   title: string;
-  createdAt: string; // Importante: string para compatibilidad con JSON
+  createdAt: string;
   updatedAt: string;
+  location?: { lat: number; lng: number } | null;
 }
 
-export interface Note extends BaseNote {
+export interface TextNote extends BaseNote {
   type: 'note';
   content: string;
-  completed?: boolean;
 }
 
 export interface ChecklistNote extends BaseNote {
   type: 'checklist';
-  items: ChecklistItem[];
+  items: { id: string; text: string; checked: boolean }[];
 }
 
 export interface IdeaNote extends BaseNote {
   type: 'idea';
   tags: string[];
-  color: string;
 }
 
-export interface ChecklistItem {
-  id: string;
-  text: string;
-  isCompleted: boolean;
-}
-
-export type AnyNote = Note | ChecklistNote | IdeaNote;
+// ESTO ES LO QUE TE FALTA PARA LA UNIÓN DE TIPOS
+export type AnyNote = TextNote | ChecklistNote | IdeaNote;

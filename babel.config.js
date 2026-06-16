@@ -8,10 +8,12 @@ module.exports = function (api) {
         {
           root: ['./'],
           alias: {
-            '@': './', // Esto le dice a Babel que @/ apunta a la raíz del proyecto
+            '@': './',
           },
         },
       ],
+      // ESTE PLUGIN DEBE SER EL ÚLTIMO SIEMPRE
+      'react-native-reanimated/plugin',
     ],
   };
 };

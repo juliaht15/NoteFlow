@@ -1,5 +1,5 @@
 // E:\Proyectos\noteflow\lib\api.ts
-import { AnyNote } from '@/types/index';
+import { AnyNote } from '../types/index';
 
 export type NoteInput = Omit<AnyNote, 'id' | 'createdAt' | 'updatedAt'>;
 

@@ -1,56 +1,60 @@
-import React, { useState } from 'react';
-import { View, TextInput, Button, StyleSheet, Text, Alert } from 'react-native';
-import { z } from 'zod';
-import { useNotesStore } from '@/store/useNoteStore';
+// E:\Proyectos\noteflow\components\AddNoteForm.tsx
+import 'react-native-get-random-values';
+import { v4 as uuidv4 } from 'uuid';
+import * as Location from 'expo-location';
 
-const noteSchema = z.object({
-  title: z.string().min(3, 'El título debe tener al menos 3 caracteres'),
-  content: z.string().min(1, 'El contenido no puede estar vacío'),
-});
+import React, { useState } from 'react';
+import { View, StyleSheet } from 'react-native';
+import { TextInput, Button, SegmentedButtons, useTheme } from 'react-native-paper';
+import { useNotesStore } from '@/store/useNoteStore';
+import { AnyNote } from '@/types';
 
 export const AddNoteForm = () => {
+  const [type, setType] = useState<string>('note');
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
-  const [error, setError] = useState<string | null>(null);
-  
+  const theme = useTheme();
   const addNote = useNotesStore((state) => state.addNote);
 
-  const handleSave = () => {
-    const result = noteSchema.safeParse({ title, content });
-    
-    if (!result.success) {
-      setError(result.error.errors[0].message);
-      return;
+  const handleSave = async () => {
+    if (!title.trim()) return;
+
+    let location = null;
+    const { status } = await Location.requestForegroundPermissionsAsync();
+    if (status === 'granted') {
+      const pos = await Location.getCurrentPositionAsync({});
+      location = { lat: pos.coords.latitude, lng: pos.coords.longitude };
     }
 
-    addNote({
-      id: Date.now().toString(),
-      title,
-      content,
-      type: 'note',
-      createdAt: new Date().toISOString(), // Cambio importante
-      updatedAt: new Date().toISOString(),
-    });
-
-    setError(null);
+    const newNote: AnyNote = type === 'note' 
+      ? { id: uuidv4(), type: 'note', title, content, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(), location }
+      : { id: uuidv4(), type: 'checklist', title, items: [], createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(), location };
+    
+    addNote(newNote);
     setTitle('');
     setContent('');
-    Alert.alert("Éxito", "Nota guardada");
   };
 
   return (
-    <View style={styles.container}>
-      <TextInput placeholder="Título" value={title} onChangeText={setTitle} style={styles.input} />
-      <TextInput placeholder="Contenido" value={content} onChangeText={setContent} style={[styles.input, styles.textArea]} multiline />
-      {error && <Text style={styles.errorText}>{error}</Text>}
-      <Button title="Guardar Nota" onPress={handleSave} />
+    <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
+      <SegmentedButtons
+        value={type}
+        onValueChange={setType}
+        buttons={[{ value: 'note', label: 'Nota' }, { value: 'checklist', label: 'Checklist' }]}
+        style={styles.segmentedButtons}
+      />
+      <TextInput label="Título" value={title} onChangeText={setTitle} mode="outlined" style={styles.input} />
+      {type === 'note' && (
+        <TextInput label="Contenido" value={content} onChangeText={setContent} mode="outlined" multiline numberOfLines={4} style={styles.input} />
+      )}
+      <Button mode="contained" onPress={handleSave} style={styles.button}>Guardar con Ubicación</Button>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: { padding: 16 },
-  input: { borderWidth: 1, borderColor: '#ccc', padding: 8, marginBottom: 12, borderRadius: 8 },
-  textArea: { height: 100, textAlignVertical: 'top' },
-  errorText: { color: 'red', marginBottom: 8 }
+  segmentedButtons: { marginBottom: 10 },
+  input: { marginVertical: 8 },
+  button: { marginTop: 20 }
 });

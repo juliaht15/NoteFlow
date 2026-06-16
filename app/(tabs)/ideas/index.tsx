@@ -1,4 +1,5 @@
 import { View, StyleSheet } from 'react-native';
+import { FlashList } from "@shopify/flash-list";
 import { NoteList } from '@/components/NoteList';
 import { useNotesStore } from '@/store/useNoteStore';
 import { COLORS } from '@/constants/theme';

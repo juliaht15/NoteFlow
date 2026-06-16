@@ -1,36 +1,47 @@
-# dependencies
+# --- Dependencias ---
 node_modules/
 .DS_Store
 
-# Expo
+# --- Expo / React Native ---
 .expo/
 dist/
 web-build/
 expo-env.d.ts
-
-# Native & Build
-.kotlin/
-*.orig.*
 *.jks
 *.p8
 *.p12
 *.key
 *.mobileprovision
 
-# Logs & Debug
+# --- Logs & Debug ---
+*.log
 npm-debug.*
 yarn-debug.*
 yarn-error.*
-*.log
 
-# Entorno (Cualquier archivo .env)
+# --- Entorno ---
+# Mantenemos esto oculto por seguridad
 .env*
 .env.local
 
-# TypeScript
+# --- TypeScript ---
 *.tsbuildinfo
 
-# Next.js (por si acaso)
+# --- Next.js / API (Carpeta noteflow-api) ---
 .next/
 out/
 build/
+# Añade esto para ignorar la caché de turbopack (si la usas)
+.turbo/
+
+# --- Configuraciones de Editor / Sistema ---
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# --- Archivos de Base de Datos / SQL ---
+# Si tu API usa sqlite u otras BD, ignóralas también
+*.db
+*.sqlite
+*.sqlite-journal

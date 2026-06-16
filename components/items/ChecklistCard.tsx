@@ -3,14 +3,17 @@ import { View, Text, StyleSheet } from 'react-native';
 import { ChecklistNote } from '@/types';
 
 export const ChecklistCard = ({ note }: { note: ChecklistNote }) => {
-  const completed = note.items.filter(i => i.isCompleted).length;
+  // Ajuste: Cambiamos 'isCompleted' por 'checked' basado en tu mensaje de error
+  const completed = note.items.filter(i => i.checked).length;
   const progress = note.items.length > 0 ? (completed / note.items.length) * 100 : 0;
 
   return (
     <View style={styles.card}>
       <Text style={styles.title}>{note.title}</Text>
       <Text>{completed}/{note.items.length} completados</Text>
-      <View style={styles.progressBar}><View style={[styles.progress, { width: `${progress}%` }]} /></View>
+      <View style={styles.progressBar}>
+        <View style={[styles.progress, { width: `${progress}%` }]} />
+      </View>
     </View>
   );
 };

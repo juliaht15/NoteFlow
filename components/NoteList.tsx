@@ -1,19 +1,48 @@
-// E:\Proyectos\noteflow\components\NoteList.tsx
-import { FlashList } from '@shopify/flash-list';
-import { View } from 'react-native';
+import React, { useState, useMemo } from 'react';
+import { View, StyleSheet } from 'react-native';
+import { FlashList } from "@shopify/flash-list";
+import { Searchbar, useTheme } from 'react-native-paper';
+import Animated, { FadeInDown } from 'react-native-reanimated';
+import { SwipeableNoteCard } from './SwipeableNoteCard';
 import { AnyNote } from '@/types';
-import { NoteCard } from './NoteCard';
 
-export const NoteList = ({ data }: { data: AnyNote[] }) => {
+interface NoteListProps {
+  data: AnyNote[];
+}
+
+export const NoteList = ({ data }: NoteListProps) => {
+  const [searchQuery, setSearchQuery] = useState('');
+  const theme = useTheme();
+
+  const filteredNotes = useMemo(() => {
+    return data.filter((note) =>
+      note.title.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [data, searchQuery]);
+
   return (
-    <View style={{ flex: 1 }}>
+    <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
+      <Searchbar
+        placeholder="Buscar notas..."
+        onChangeText={setSearchQuery}
+        value={searchQuery}
+        style={styles.searchbar}
+      />
       <FlashList
-        data={data}
-        renderItem={({ item }) => <NoteCard note={item} />}
-        keyExtractor={(item) => item.id}
-        // @ts-ignore: Saltamos la validación de tipos que está fallando por caché de VS Code
-        estimatedItemSize={100} 
+  data={filteredNotes}
+  keyExtractor={(item) => item.id}
+  renderItem={({ item, index }: { item: AnyNote; index: number }) => (
+    <Animated.View entering={FadeInDown.delay(index * 100)}>
+      <SwipeableNoteCard note={item} />
+    </Animated.View>
+  )}
+  estimatedItemSize={100}
       />
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: { flex: 1 },
+  searchbar: { margin: 16 }
+});

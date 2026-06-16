@@ -1,4 +1,5 @@
 import { View, Text, StyleSheet, useColorScheme } from 'react-native';
+import { FlashList } from "@shopify/flash-list";
 
 export default function HomeScreen() {
   const isDarkMode = useColorScheme() === 'dark';

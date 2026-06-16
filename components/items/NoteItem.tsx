@@ -1,11 +1,13 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { Note } from '@/types';
+import { AnyNote } from '@/types'; // Cambiado de 'Note' a 'AnyNote'
 
-export const NoteItem = ({ note }: { note: Note }) => (
+export const NoteItem = ({ note }: { note: AnyNote }) => (
   <View style={styles.card}>
     <Text style={styles.title}>{note.title}</Text>
-    <Text>{note.content}</Text>
+    {/* Nota: Asegúrate de que AnyNote tenga la propiedad 'content'. 
+        Si es un Checklist, 'content' podría no existir */}
+    {'content' in note && <Text>{note.content}</Text>}
   </View>
 );
 

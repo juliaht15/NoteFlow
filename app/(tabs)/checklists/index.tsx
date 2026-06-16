@@ -1,18 +1,28 @@
+// E:\Proyectos\noteflow\app\(tabs)\checklists\index.tsx
 import { View, StyleSheet } from 'react-native';
-import { NoteList } from '@/components/NoteList';
+import { FlashList } from "@shopify/flash-list";
 import { useNotesStore } from '@/store/useNoteStore';
-import { COLORS } from '@/constants/theme';
+import { ChecklistNote } from '@/types'; // Asegúrate de importar el tipo
+import { SwipeableNoteCard } from '@/components/SwipeableNoteCard';
 
 export default function ChecklistsScreen() {
-  const checklists = useNotesStore((state) => state.notes.filter((n) => n.type === 'checklist'));
+  const notes = useNotesStore((state) => state.notes);
   
+  // Filtramos solo las checklists
+  const checklists = notes.filter((n): n is ChecklistNote => n.type === 'checklist');
+
   return (
     <View style={styles.container}>
-      <NoteList data={checklists} />
+      <FlashList
+  data={checklists}
+  keyExtractor={(item) => item.id}
+  renderItem={({ item }: { item: ChecklistNote }) => (
+    <SwipeableNoteCard note={item} />
+  )}
+  estimatedItemSize={100}
+      />
     </View>
   );
 }
 
-const styles = StyleSheet.create({ 
-  container: { flex: 1, backgroundColor: COLORS.light.surface } 
-});
+const styles = StyleSheet.create({ container: { flex: 1 } });
