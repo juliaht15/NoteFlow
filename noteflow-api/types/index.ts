@@ -3,8 +3,8 @@ export interface AnyNote {
   title: string;
   content?: string;
   type: 'note' | 'checklist' | 'idea';
-  latitude?: number;
-  longitude?: number;
-  createdAt: Date;
-  updatedAt: Date;
+  latitude?: number | null;
+  longitude?: number | null;
+  createdAt: string;
+  updatedAt: string;
 }

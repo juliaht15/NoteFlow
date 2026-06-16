@@ -1,9 +1,9 @@
-// E:\Proyectos\noteflow\lib\api.ts
 import { AnyNote } from '@/types/index';
 
-export type NoteInput = Omit<AnyNote, 'id' | 'createdAt' | 'updatedAt'>;
+// El input ahora incluye el ID generado por la app móvil o Firebase
+export type NoteInput = Omit<AnyNote, 'createdAt' | 'updatedAt'>;
 
-const API_URL = 'http://localhost:3000/api'; 
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api'; 
 
 export const api = {
   getNotes: async (): Promise<AnyNote[]> => {

@@ -1,10 +1,8 @@
--- El comando CASCADE se encarga de borrar las dependencias (como checklist_items) automáticamente
-DROP TABLE IF EXISTS notes CASCADE;
 DROP TABLE IF EXISTS checklist_items CASCADE;
+DROP TABLE IF EXISTS notes CASCADE;
 
--- Ahora creamos las tablas desde cero
 CREATE TABLE notes (
-    id SERIAL PRIMARY KEY,
+    id TEXT PRIMARY KEY, -- Alineado con los UUIDs de la app móvil
     title TEXT NOT NULL,
     content TEXT,
     type TEXT NOT NULL CHECK (type IN ('note', 'checklist', 'idea')),
@@ -15,8 +13,8 @@ CREATE TABLE notes (
 );
 
 CREATE TABLE checklist_items (
-    id SERIAL PRIMARY KEY,
-    note_id INTEGER REFERENCES notes(id) ON DELETE CASCADE,
+    id TEXT PRIMARY KEY,
+    note_id TEXT REFERENCES notes(id) ON DELETE CASCADE,
     text TEXT NOT NULL,
     is_completed BOOLEAN DEFAULT FALSE
 );

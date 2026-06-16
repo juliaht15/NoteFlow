@@ -3,16 +3,40 @@ import { z } from 'zod';
 import { query } from '@/lib/db';
 
 const noteSchema = z.object({
-  title: z.string().min(3),
+  id: z.string(),
+  title: z.string().min(1),
   content: z.string().optional().nullable(),
   type: z.enum(['note', 'checklist', 'idea']),
   latitude: z.number().optional().nullable(),
   longitude: z.number().optional().nullable(),
 });
 
+interface DBNoteRow {
+  id: string;
+  title: string;
+  content: string | null;
+  type: 'note' | 'checklist' | 'idea';
+  latitude: string | null;
+  longitude: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
 export async function GET() {
   try {
-    const notes = await query('SELECT * FROM notes ORDER BY created_at DESC');
+    const dbNotes = await query<DBNoteRow>('SELECT * FROM notes ORDER BY created_at DESC');
+    
+    const notes = dbNotes.map((note) => ({
+      id: note.id,
+      title: note.title,
+      content: note.content,
+      type: note.type,
+      latitude: note.latitude ? parseFloat(note.latitude) : null,
+      longitude: note.longitude ? parseFloat(note.longitude) : null,
+      createdAt: note.created_at,
+      updatedAt: note.updated_at,
+    }));
+
     return NextResponse.json(notes);
   } catch (error) {
     console.error('Error GET:', error);
@@ -25,10 +49,12 @@ export async function POST(request: Request) {
     const body = await request.json();
     const validatedData = noteSchema.parse(body);
 
-    const result = await query(
-      `INSERT INTO notes (title, content, type, latitude, longitude) 
-       VALUES ($1, $2, $3, $4, $5) RETURNING *`,
+    const result = await query<DBNoteRow>(
+      `INSERT INTO notes (id, title, content, type, latitude, longitude) 
+       VALUES ($1, $2, $3, $4, $5, $6) 
+       RETURNING id, title, content, type, latitude, longitude, created_at, updated_at`,
       [
+        validatedData.id,
         validatedData.title, 
         validatedData.content ?? null, 
         validatedData.type, 
@@ -37,7 +63,18 @@ export async function POST(request: Request) {
       ]
     );
 
-    return NextResponse.json(result[0], { status: 201 });
+    const newNote = {
+      id: result[0].id,
+      title: result[0].title,
+      content: result[0].content,
+      type: result[0].type,
+      latitude: result[0].latitude ? parseFloat(result[0].latitude) : null,
+      longitude: result[0].longitude ? parseFloat(result[0].longitude) : null,
+      createdAt: result[0].created_at,
+      updatedAt: result[0].updated_at,
+    };
+
+    return NextResponse.json(newNote, { status: 201 });
   } catch (error: unknown) {
     if (error instanceof z.ZodError) {
       return NextResponse.json({ error: error.issues }, { status: 400 });
