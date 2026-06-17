@@ -17,7 +17,7 @@ export const SwipeableNoteCard = ({ note, onPress }: { note: AnyNote; onPress?: 
   return (
     <Swipeable renderRightActions={renderRightActions}>
       <Card style={styles.card} onPress={onPress}>
-        <Card.Title title={note.title} />
+        <Card.Title title={note.title} titleStyle={styles.cardTitle} />
         <Card.Content>
           {note.content ? <Text variant="bodyMedium" numberOfLines={2}>{note.content}</Text> : null}
           {note.type === 'checklist' && 'items' in note && (
@@ -32,14 +32,15 @@ export const SwipeableNoteCard = ({ note, onPress }: { note: AnyNote; onPress?: 
 };
 
 const styles = StyleSheet.create({
-  card: { marginBottom: 10, marginHorizontal: 16 },
+  card: { marginBottom: 10, marginHorizontal: 16, borderRadius: 12 },
+  cardTitle: { fontWeight: '700' },
   deleteActionContainer: {
     backgroundColor: '#ff3b30',
     justifyContent: 'center',
     alignItems: 'center',
     width: 80,
     marginBottom: 10,
-    borderRadius: 8,
+    borderRadius: 12,
   },
   subInfo: { marginTop: 4, opacity: 0.7 }
 });

@@ -60,7 +60,7 @@ export default function IdeaDetailScreen() {
   };
 
   const bgStyle = (colors as any).background || colors.surface || '#121212';
-  const errorColor = (colors as any).error || colors.notification || '#ff1744';
+  const errorColor = colors.danger || '#ff1744';
   const disabledColor = (colors as any).disabled || colors.secondaryText || '#777777';
 
   return (

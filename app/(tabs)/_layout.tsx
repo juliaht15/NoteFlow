@@ -1,3 +1,4 @@
+import React from 'react';
 import { Tabs } from 'expo-router';
 import { useTheme } from '../../constants/theme';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -12,9 +13,19 @@ export default function TabsLayout() {
         tabBarInactiveTintColor: colors.secondaryText,
         tabBarStyle: {
           backgroundColor: colors.surface,
-          borderTopColor: colors.border,
-          height: 60,
+          borderTopColor: 'transparent',
+          position: 'absolute',
+          bottom: 20,
+          left: 16,
+          right: 16,
+          borderRadius: 16,
+          height: 64,
           paddingBottom: 8,
+          shadowColor: '#000',
+          shadowOffset: { width: 0, height: 4 },
+          shadowOpacity: 0.15,
+          shadowRadius: 8,
+          elevation: 5,
         },
         headerStyle: {
           backgroundColor: colors.surface,
@@ -60,10 +71,13 @@ export default function TabsLayout() {
         }}
       />
 
-      {/* Ocultamos los detalles y rutas internas para que no creen botones extra abajo */}
+      {/* Ocultar las rutas dinámicas de la barra de pestañas */}
       <Tabs.Screen name="notas/[id]" options={{ href: null }} />
       <Tabs.Screen name="checklists/[id]" options={{ href: null }} />
       <Tabs.Screen name="ideas/[id]" options={{ href: null }} />
+      
+      {/* Si el archivo settings.tsx está dentro de app/(tabs)/settings.tsx, se declara aquí sin pestaña */}
+      <Tabs.Screen name="settings" options={{ href: null }} />
     </Tabs>
   );
 }
