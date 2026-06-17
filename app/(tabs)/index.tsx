@@ -1,93 +1,91 @@
-import { View, Text, StyleSheet, Pressable } from 'react-native';
-import { useNotesStore } from '../../store/useNoteStore';
+import React from 'react';
+import { View, StyleSheet, ScrollView } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { Text, Avatar, Card, IconButton } from 'react-native-paper';
 import { useTheme } from '../../constants/theme';
-import { Ionicons } from '@expo/vector-icons';
+import { useNotesStore } from '../../store/useNoteStore';
+import { useRouter } from 'expo-router';
 
 export default function HomeScreen() {
-  const { colors, spacing, typography } = useTheme();
+  const { colors, spacing, toggleTheme, isDarkMode } = useTheme() as any;
+  const router = useRouter();
   const notes = useNotesStore((state) => state.notes);
 
-  const totalNotas = notes.filter((n) => n.type === 'note').length;
-  const totalChecklists = notes.filter((n) => n.type === 'checklist').length;
-  const totalIdeas = notes.filter((n) => n.type === 'idea').length;
+  const notesCount = notes.filter(n => n.type === 'note').length;
+  const checklistsCount = notes.filter(n => n.type === 'checklist').length;
+  const ideasCount = notes.filter(n => n.type === 'idea').length;
+
+  const bgStyle = colors.background || colors.surface || '#121212';
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.surface === '#ffffff' ? '#f3f2f1' : '#11100f', padding: spacing.md }]}>
-      
-      <View style={styles.header}>
-        <View style={styles.userSection}>
-          <View style={[styles.avatar, { backgroundColor: colors.primary }]}>
-            <Text style={styles.avatarText}>RH</Text>
+    <SafeAreaView style={[styles.safeArea, { backgroundColor: bgStyle }]} edges={['top', 'left', 'right']}>
+      <ScrollView contentContainerStyle={[styles.container, { padding: spacing.md }]}>
+        
+        <View style={styles.profileContainer}>
+          <Avatar.Text size={48} label="JH" style={{ backgroundColor: colors.primary }} />
+          <View style={styles.textContainer}>
+            <Text variant="titleMedium" style={{ color: colors.text, fontWeight: '700' }}>
+              Julia Huertas
+            </Text>
+            <Text variant="bodySmall" style={{ color: colors.secondaryText }}>
+              Técnica en DAM & Dev
+            </Text>
           </View>
-          <View>
-            <Text style={[styles.userName, { color: colors.text, fontSize: typography.fontSize.md }]}>
-              Rocío Huertas
-            </Text>
-            <Text style={[styles.userEmail, { color: colors.secondaryText, fontSize: typography.fontSize.xs }]}>
-              Sociosanitario & Dev
-            </Text>
+          
+          <View style={styles.rightActions}>
+            <IconButton 
+              icon={isDarkMode ? "weather-sunny" : "weather-night"} 
+              iconColor={colors.text} 
+              size={24} 
+              onPress={toggleTheme} 
+            />
+            <IconButton 
+              icon="cog" 
+              iconColor={colors.text} 
+              size={24} 
+              onPress={() => router.push('/settings' as any)} 
+            />
           </View>
         </View>
-        <Pressable style={[styles.iconButton, { borderColor: colors.border }]}>
-          <Ionicons name="search" size={20} color={colors.text} />
-        </Pressable>
-      </View>
 
-      <View style={[styles.menuContainer, { backgroundColor: colors.surface, borderRadius: 8, borderColor: colors.border, borderWidth: 1 }]}>
-        <Pressable style={[styles.menuItem, { borderBottomWidth: 1, borderBottomColor: colors.border, padding: spacing.md }]}>
-          <View style={styles.menuItemLeft}>
-            <Ionicons name="document-text" size={22} color="#70A1FF" style={styles.menuIcon} />
-            <Text style={[styles.menuText, { color: colors.text, fontSize: typography.fontSize.md }]}>Notas</Text>
-          </View>
-          <Text style={[styles.badge, { color: colors.secondaryText, fontSize: typography.fontSize.sm }]}>{totalNotas}</Text>
-        </Pressable>
+        <Card style={[styles.card, { backgroundColor: colors.surface }]} onPress={() => router.push('/notas')}>
+          <Card.Title
+            title="Notas"
+            titleStyle={{ color: colors.text }}
+            left={(props) => <Avatar.Icon size={props.size} icon="file-document" style={{ backgroundColor: 'transparent' }} color={colors.primary} />}
+            right={() => <Text style={[styles.count, { color: colors.secondaryText }]}>{notesCount}</Text>}
+          />
+        </Card>
 
-        <Pressable style={[styles.menuItem, { borderBottomWidth: 1, borderBottomColor: colors.border, padding: spacing.md }]}>
-          <View style={styles.menuItemLeft}>
-            <Ionicons name="checkbox" size={22} color="#2ECC71" style={styles.menuIcon} />
-            <Text style={[styles.menuText, { color: colors.text, fontSize: typography.fontSize.md }]}>Checklists</Text>
-          </View>
-          <Text style={[styles.badge, { color: colors.secondaryText, fontSize: typography.fontSize.sm }]}>{totalChecklists}</Text>
-        </Pressable>
+        <Card style={[styles.card, { backgroundColor: colors.surface }]} onPress={() => router.push('/checklists')}>
+          <Card.Title
+            title="Checklists"
+            titleStyle={{ color: colors.text }}
+            left={(props) => <Avatar.Icon size={props.size} icon="checkbox-marked" style={{ backgroundColor: 'transparent' }} color="#4caf50" />}
+            right={() => <Text style={[styles.count, { color: colors.secondaryText }]}>{checklistsCount}</Text>}
+          />
+        </Card>
 
-        <Pressable style={[styles.menuItem, { padding: spacing.md }]}>
-          <View style={styles.menuItemLeft}>
-            <Ionicons name="bulb" size={22} color="#FFD15C" style={styles.menuIcon} />
-            <Text style={[styles.menuText, { color: colors.text, fontSize: typography.fontSize.md }]}>Ideas</Text>
-          </View>
-          <Text style={[styles.badge, { color: colors.secondaryText, fontSize: typography.fontSize.sm }]}>{totalIdeas}</Text>
-        </Pressable>
-      </View>
+        <Card style={[styles.card, { backgroundColor: colors.surface }]} onPress={() => router.push('/ideas')}>
+          <Card.Title
+            title="Ideas"
+            titleStyle={{ color: colors.text }}
+            left={(props) => <Avatar.Icon size={props.size} icon="lightbulb" style={{ backgroundColor: 'transparent' }} color="#ffeb3b" />}
+            right={() => <Text style={[styles.count, { color: colors.secondaryText }]}>{ideasCount}</Text>}
+          />
+        </Card>
 
-      <View style={styles.footer}>
-        <Pressable style={[styles.logoutButton, { borderTopWidth: 1, borderTopColor: colors.border, padding: spacing.md }]}>
-          <Ionicons name="log-out-outline" size={20} color={colors.danger} />
-          <Text style={[styles.logoutText, { color: colors.danger, fontSize: typography.fontSize.md, marginLeft: spacing.sm }]}>
-            Cerrar sesión
-          </Text>
-        </Pressable>
-      </View>
-
-    </View>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
-  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24, marginTop: 10 },
-  userSection: { flexDirection: 'row', alignItems: 'center' },
-  avatar: { width: 42, height: 42, borderRadius: 21, justifyContent: 'center', alignItems: 'center', marginRight: 12 },
-  avatarText: { color: '#fff', fontWeight: 'bold', fontSize: 16 },
-  userName: { fontWeight: '700' },
-  userEmail: { marginTop: 2 },
-  iconButton: { width: 40, height: 40, borderRadius: 20, borderWidth: 1, justifyContent: 'center', alignItems: 'center' },
-  menuContainer: { overflow: 'hidden' },
-  menuItem: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  menuItemLeft: { flexDirection: 'row', alignItems: 'center' },
-  menuIcon: { marginRight: 14 },
-  menuText: { fontWeight: '500' },
-  badge: { fontWeight: '600' },
-  footer: { position: 'absolute', bottom: 0, left: 0, right: 0 },
-  logoutButton: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center' },
-  logoutText: { fontWeight: '600' },
+  safeArea: { flex: 1 },
+  container: { flexGrow: 1, justifyContent: 'flex-start' },
+  profileContainer: { flexDirection: 'row', alignItems: 'center', marginBottom: 24 },
+  textContainer: { marginLeft: 16, flex: 1 },
+  rightActions: { flexDirection: 'row', alignItems: 'center' },
+  card: { marginBottom: 12, borderRadius: 12, elevation: 1 },
+  count: { marginRight: 16, fontSize: 16, fontWeight: '600' }
 });

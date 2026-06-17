@@ -1,107 +1,160 @@
-import { View, StyleSheet, Alert, Pressable } from 'react-native';
-import { Text } from 'react-native-paper';
+import React, { useState, useEffect } from 'react';
+import { View, StyleSheet, ScrollView } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { useNotesStore } from '@/store/useNoteStore';
-import { useTheme } from '@/constants/theme';
-import { IdeaNote } from '@/types';
-import { Ionicons } from '@expo/vector-icons';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { TextInput, Button, IconButton, Text, Chip } from 'react-native-paper';
+import { useNotesStore } from '../../../store/useNoteStore';
+import { useTheme } from '../../../constants/theme';
 
-export default function IdeaDetalleScreen() {
-  const { id } = useLocalSearchParams<{ id: string }>();
+export default function IdeaDetailScreen() {
+  const { id } = useLocalSearchParams();
   const router = useRouter();
-  const { colors, spacing, typography } = useTheme();
+  const { colors, spacing } = useTheme();
   
-  const rawNote = useNotesStore((state) => state.notes.find((n) => n.id === id));
-  const removeNote = useNotesStore((state) => state.removeNote);
+  const notes = useNotesStore((state) => state.notes);
+  const updateNote = useNotesStore((state) => (state as any).updateNote);
+  const deleteNote = useNotesStore((state) => (state as any).deleteNote);
 
-  if (!rawNote || rawNote.type !== 'idea') {
+  const currentIdea = notes.find((n) => n.id === id) as any;
+
+  const [isEditing, setIsEditing] = useState(false);
+  const [title, setTitle] = useState('');
+  const [content, setContent] = useState('');
+  const [tagsInput, setTagsInput] = useState('');
+
+  useEffect(() => {
+    if (currentIdea) {
+      setTitle(currentIdea.title || '');
+      setContent(currentIdea.content || '');
+      if (currentIdea.tags) {
+        setTagsInput(currentIdea.tags.join(', '));
+      }
+    }
+  }, [currentIdea]);
+
+  if (!currentIdea || currentIdea.type !== 'idea') {
     return (
-      <View style={[styles.container, { backgroundColor: colors.surface, justifyContent: 'center', alignItems: 'center' }]}>
+      <SafeAreaView style={[styles.center, { backgroundColor: colors.surface }]}>
         <Text style={{ color: colors.text }}>Idea no encontrada</Text>
-      </View>
+      </SafeAreaView>
     );
   }
 
-  const note = rawNote as IdeaNote;
-
-  const handleDelete = () => {
-    Alert.alert(
-      'Eliminar idea',
-      '¿Quieres eliminar esta idea de forma permanente?',
-      [
-        { text: 'Cancelar', style: 'cancel' },
-        {
-          text: 'Eliminar',
-          style: 'destructive',
-          onPress: () => {
-            removeNote(note.id);
-            router.back();
-          },
-        },
-      ]
-    );
+  const handleSaveChanges = () => {
+    if (updateNote) {
+      updateNote(currentIdea.id, {
+        title: title.trim(),
+        content: content.trim(),
+        tags: tagsInput.split(',').map(t => t.trim()).filter(t => t.length > 0),
+        updatedAt: new Date().toISOString(),
+      });
+    }
+    setIsEditing(false);
   };
 
+  const handleDelete = () => {
+    if (deleteNote) {
+      deleteNote(currentIdea.id);
+      router.back();
+    }
+  };
+
+  const bgStyle = (colors as any).background || colors.surface || '#121212';
+  const errorColor = (colors as any).error || colors.notification || '#ff1744';
+  const disabledColor = (colors as any).disabled || colors.secondaryText || '#777777';
+
   return (
-    <View style={[styles.container, { backgroundColor: colors.surface, padding: spacing.md }]}>
-      <View style={styles.header}>
-        <Text variant="headlineMedium" style={[styles.title, { color: colors.text }]}>
-          {note.title}
-        </Text>
-        <Pressable onPress={handleDelete} style={styles.deleteButton}>
-          <Ionicons name="trash-outline" size={22} color={colors.danger} />
-        </Pressable>
-      </View>
+    <SafeAreaView style={[styles.safeArea, { backgroundColor: bgStyle }]} edges={['top', 'left', 'right']}>
+      <ScrollView contentContainerStyle={[styles.container, { padding: spacing.md }]}>
+        
+        <View style={styles.headerActions}>
+          <IconButton
+            icon={isEditing ? "close" : "pencil"}
+            iconColor={colors.text}
+            size={24}
+            onPress={() => setIsEditing(!isEditing)}
+          />
+          <IconButton
+            icon="delete"
+            iconColor={errorColor}
+            size={24}
+            onPress={handleDelete}
+          />
+        </View>
 
-      <View style={styles.tagsContainer}>
-        {note.tags.map((tag, index) => (
-          <View key={index} style={[styles.chip, { backgroundColor: colors.border }]}>
-            <Text style={[styles.chipText, { color: colors.primary }]}>#{tag}</Text>
+        {isEditing ? (
+          <View style={styles.form}>
+            <TextInput
+              label="Título de la idea"
+              value={title}
+              onChangeText={setTitle}
+              mode="outlined"
+              style={styles.input}
+            />
+            <TextInput
+              label="Contenido / Descripción"
+              value={content}
+              onChangeText={setContent}
+              mode="outlined"
+              multiline
+              numberOfLines={4}
+              style={styles.input}
+            />
+            <TextInput
+              label="Etiquetas (separadas por comas)"
+              value={tagsInput}
+              onChangeText={setTagsInput}
+              mode="outlined"
+              style={styles.input}
+            />
+            <Button mode="contained" onPress={handleSaveChanges} style={styles.saveButton}>
+              Guardar Idea
+            </Button>
           </View>
-        ))}
-      </View>
+        ) : (
+          <View style={styles.displayContainer}>
+            <Text variant="headlineMedium" style={[styles.title, { color: colors.text }]}>
+              {currentIdea.title}
+            </Text>
 
-      <Text style={[styles.date, { color: colors.secondaryText, fontSize: typography.fontSize.xs }]}>
-        Creada: {new Date(note.createdAt).toLocaleDateString()}
-      </Text>
-    </View>
+            {currentIdea.content ? (
+              <Text variant="bodyLarge" style={[styles.content, { color: colors.secondaryText, marginBottom: 16 }]}>
+                {currentIdea.content}
+              </Text>
+            ) : null}
+
+            {currentIdea.tags && currentIdea.tags.length > 0 ? (
+              <View style={styles.tagsContainer}>
+                {currentIdea.tags.map((tag: string, index: number) => (
+                  <Chip key={index} style={styles.chip} textStyle={{ color: colors.text }}>
+                    {tag}
+                  </Chip>
+                ))}
+              </View>
+            ) : null}
+
+            <Text variant="bodySmall" style={{ color: disabledColor, marginTop: 24 }}>
+              Actualizada: {new Date(currentIdea.updatedAt).toLocaleDateString()}
+            </Text>
+          </View>
+        )}
+
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { 
-    flex: 1 
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    marginBottom: 16,
-  },
-  title: {
-    flex: 1,
-    fontWeight: '700',
-  },
-  deleteButton: {
-    padding: 4,
-    marginLeft: 8,
-  },
-  tagsContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-    marginVertical: 8,
-  },
-  chip: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 16,
-  },
-  chipText: {
-    fontWeight: '600',
-    fontSize: 14,
-  },
-  date: {
-    marginTop: 24,
-  },
+  safeArea: { flex: 1 },
+  container: { flexGrow: 1 },
+  center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+  headerActions: { flexDirection: 'row', justifyContent: 'flex-end', marginBottom: 16 },
+  form: { width: '100%' },
+  input: { marginBottom: 16 },
+  saveButton: { marginTop: 8 },
+  displayContainer: { paddingHorizontal: 4 },
+  title: { fontWeight: '700', marginBottom: 16 },
+  content: { lineHeight: 24 },
+  tagsContainer: { flexDirection: 'row', flexWrap: 'wrap', marginTop: 8 },
+  chip: { marginRight: 8, marginBottom: 8 }
 });

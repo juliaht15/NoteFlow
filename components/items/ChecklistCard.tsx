@@ -5,14 +5,16 @@ import { useTheme } from '@/constants/theme';
 
 export const ChecklistCard = ({ note }: { note: ChecklistNote }) => {
   const { colors } = useTheme();
-  const completed = note.items.filter(i => i.checked).length;
-  const progress = note.items.length > 0 ? (completed / note.items.length) * 100 : 0;
+  
+  const checklistItems = note.items || [];
+  const completed = checklistItems.filter(i => i && i.checked).length;
+  const progress = checklistItems.length > 0 ? (completed / checklistItems.length) * 100 : 0;
 
   return (
     <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}>
       <Text style={[styles.title, { color: colors.text }]}>{note.title}</Text>
       <Text style={[styles.info, { color: colors.secondaryText }]}>
-        {completed}/{note.items.length} completados
+        {completed}/{checklistItems.length} completados
       </Text>
       <View style={[styles.progressBar, { backgroundColor: colors.border }]}>
         <View style={[styles.progress, { width: `${progress}%`, backgroundColor: colors.primary }]} />

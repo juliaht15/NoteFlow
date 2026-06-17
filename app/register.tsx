@@ -44,8 +44,7 @@ export default function RegisterScreen() {
     }
   };
 
-  // Extraemos de forma segura mapeando un color de respaldo si la propiedad exacta falla en el tipado
-  const backgroundColorStyle = (colors as any).background || colors.surface || '#121212';
+  const backgroundColorStyle = colors.background || colors.surface || '#121212';
 
   return (
     <View style={[styles.container, { backgroundColor: backgroundColorStyle }]}>
@@ -62,7 +61,6 @@ export default function RegisterScreen() {
         mode="outlined"
         autoCapitalize="none"
         keyboardType="email-address"
-        textColor={colors.text}
         style={styles.input}
       />
       <TextInput
@@ -71,7 +69,6 @@ export default function RegisterScreen() {
         onChangeText={setPassword}
         secureTextEntry
         mode="outlined"
-        textColor={colors.text}
         style={styles.input}
       />
       <Button

@@ -5,7 +5,7 @@ import { Swipeable } from 'react-native-gesture-handler';
 import { useNotesStore } from '@/store/useNoteStore';
 import { AnyNote } from '@/types/index';
 
-export const SwipeableNoteCard = ({ note }: { note: AnyNote }) => {
+export const SwipeableNoteCard = ({ note, onPress }: { note: AnyNote; onPress?: () => void }) => {
   const removeNote = useNotesStore((state) => state.removeNote);
 
   const renderRightActions = () => (
@@ -16,11 +16,15 @@ export const SwipeableNoteCard = ({ note }: { note: AnyNote }) => {
 
   return (
     <Swipeable renderRightActions={renderRightActions}>
-      <Card style={styles.card}>
+      <Card style={styles.card} onPress={onPress}>
         <Card.Title title={note.title} />
         <Card.Content>
-          {'content' in note && <Text variant="bodyMedium">{note.content}</Text>}
-          {'items' in note && <Text variant="bodySmall">Lista: {note.items.length} tareas</Text>}
+          {note.content ? <Text variant="bodyMedium" numberOfLines={2}>{note.content}</Text> : null}
+          {note.type === 'checklist' && 'items' in note && (
+            <Text variant="bodySmall" style={styles.subInfo}>
+              Lista: {(note.items || []).filter(i => i.checked).length}/{(note.items || []).length} completados
+            </Text>
+          )}
         </Card.Content>
       </Card>
     </Swipeable>
@@ -30,7 +34,12 @@ export const SwipeableNoteCard = ({ note }: { note: AnyNote }) => {
 const styles = StyleSheet.create({
   card: { marginBottom: 10, marginHorizontal: 16 },
   deleteActionContainer: {
-    backgroundColor: '#ff3b30', justifyContent: 'center', alignItems: 'center',
-    width: 80, marginBottom: 10, borderRadius: 8,
-  }
+    backgroundColor: '#ff3b30',
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: 80,
+    marginBottom: 10,
+    borderRadius: 8,
+  },
+  subInfo: { marginTop: 4, opacity: 0.7 }
 });

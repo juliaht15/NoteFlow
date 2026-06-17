@@ -1,56 +1,45 @@
 import React, { useState } from 'react';
 import { View, StyleSheet } from 'react-native';
-import { TextInput, Button, SegmentedButtons } from 'react-native-paper';
+import { TextInput, Button } from 'react-native-paper';
 import { useNotesStore } from '../store/useNoteStore';
 import { useTheme } from '../constants/theme';
-import { useLocation } from '../hooks/useLocation';
-import { TextNote, ChecklistNote, IdeaNote } from '../types';
 
-type NewTextNote = Omit<TextNote, 'id' | 'createdAt' | 'updatedAt'>;
-type NewChecklistNote = Omit<ChecklistNote, 'id' | 'createdAt' | 'updatedAt'>;
-type NewIdeaNote = Omit<IdeaNote, 'id' | 'createdAt' | 'updatedAt'>;
+interface AddNoteFormProps {
+  type: 'note' | 'checklist' | 'idea';
+}
 
-export const AddNoteForm = () => {
-  const [type, setType] = useState<string>('note');
+export const AddNoteForm = ({ type }: AddNoteFormProps) => {
+  const { colors } = useTheme();
+  const addNote = useNotesStore((state) => state.addNote);
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [tags, setTags] = useState('');
-  const { colors, spacing } = useTheme();
-  
-  const addNote = useNotesStore((state) => state.addNote);
-  const { getCurrentLocation } = useLocation();
 
-  const handleSave = async () => {
+  const handleSave = () => {
     if (!title.trim()) return;
 
-    const location = await getCurrentLocation();
+    const noteData: any = {
+      title: title.trim(),
+      type,
+    };
 
-    if (type === 'note') {
-      const newNote: NewTextNote = {
-        type: 'note',
-        title,
-        content,
-        location,
-      };
-      addNote(newNote as any);
-    } else if (type === 'checklist') {
-      const newChecklist: NewChecklistNote = {
-        type: 'checklist',
-        title,
-        items: [],
-        location,
-      };
-      addNote(newChecklist as any);
-    } else {
-      const parsedTags = tags.split(',').map(t => t.trim()).filter(t => t.length > 0);
-      const newIdea: NewIdeaNote = {
-        type: 'idea',
-        title,
-        tags: parsedTags,
-        location,
-      };
-      addNote(newIdea as any);
+    // Tanto notas, checklists como ideas ahora pueden llevar descripción/contenido base
+    if (type === 'note' || type === 'idea' || type === 'checklist') {
+      noteData.content = content.trim();
     }
+
+    // Si es checklist, además inicializamos una estructura de items interactivos limpios
+    if (type === 'checklist') {
+      noteData.items = content.trim() 
+        ? content.split('\n').map((line, idx) => ({ id: String(idx), text: line.trim(), checked: false }))
+        : [];
+    }
+
+    if (type === 'idea' && tags.trim()) {
+      noteData.tags = tags.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0);
+    }
+
+    addNote(noteData);
 
     setTitle('');
     setContent('');
@@ -58,61 +47,45 @@ export const AddNoteForm = () => {
   };
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.surface, padding: spacing.md }]}>
-      <SegmentedButtons
-        value={type}
-        onValueChange={setType}
-        buttons={[
-          { value: 'note', label: 'Nota' },
-          { value: 'checklist', label: 'Lista' },
-          { value: 'idea', label: 'Idea' }
-        ]}
-        style={styles.segmentedButtons}
-      />
-      <TextInput 
-        label="Título" 
-        value={title} 
-        onChangeText={setTitle} 
-        mode="outlined" 
-        textColor={colors.text}
-        style={styles.input} 
+    <View style={[styles.container, { backgroundColor: colors.surface }]}>
+      <TextInput
+        label="Título"
+        value={title}
+        onChangeText={setTitle}
+        mode="outlined"
+        style={styles.input}
       />
       
-      {type === 'note' && (
-        <TextInput 
-          label="Contenido" 
-          value={content} 
-          onChangeText={setContent} 
-          mode="outlined" 
-          multiline 
-          numberOfLines={4} 
-          textColor={colors.text}
-          style={styles.input} 
+      <TextInput
+        label={type === 'checklist' ? "Elementos (uno por línea)" : "Contenido / Descripción"}
+        value={content}
+        onChangeText={setContent}
+        mode="outlined"
+        multiline
+        numberOfLines={3}
+        style={styles.input}
+      />
+
+      {type === 'idea' && (
+        <TextInput
+          label="Etiquetas (separadas por comas)"
+          value={tags}
+          onChangeText={setTags}
+          mode="outlined"
+          placeholder="ej: diseño, backend, bug"
+          style={styles.input}
         />
       )}
 
-      {type === 'idea' && (
-        <TextInput 
-          label="Etiquetas (separadas por comas)" 
-          value={tags} 
-          onChangeText={setTags} 
-          mode="outlined" 
-          placeholder="innovación, código, diseño"
-          textColor={colors.text}
-          style={styles.input} 
-        />
-      )}
-      
-      <Button mode="contained" onPress={handleSave} buttonColor={colors.primary} style={styles.button}>
-        Guardar Nota
+      <Button mode="contained" onPress={handleSave} style={styles.button}>
+        Guardar {type === 'note' ? 'Nota' : type === 'checklist' ? 'Lista' : 'Idea'}
       </Button>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { borderRadius: 8 },
-  segmentedButtons: { marginBottom: 10 },
-  input: { marginVertical: 6 },
-  button: { marginTop: 14 }
+  container: { padding: 16, borderRadius: 8, marginBottom: 16 },
+  input: { marginBottom: 12 },
+  button: { marginTop: 4 }
 });
