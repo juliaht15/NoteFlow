@@ -42,14 +42,19 @@ export default function HomeScreen() {
     <ScrollView style={[styles.container, { backgroundColor: colors.background }]}>
       {/* Sección de Bienvenida */}
       <View style={styles.header}>
-        <Avatar.Image 
-          size={60} 
-          source={
-            user.photoURL 
-              ? { uri: user.photoURL } 
-              : require('../../assets/images/react-logo.png')
-          } 
-        />
+        {user.photoURL ? (
+          <Avatar.Image 
+            size={60} 
+            source={{ uri: user.photoURL }} 
+          />
+        ) : (
+          <Avatar.Icon 
+            size={60} 
+            icon="account" 
+            style={{ backgroundColor: colors.primary }}
+            color="#fff"
+          />
+        )}
         <View style={styles.headerText}>
           <Text variant="titleMedium" style={{ color: colors.secondaryText }}>Bienvenido de nuevo 👋</Text>
           <Text variant="headlineSmall" style={[styles.bold, { color: colors.text }]}>
