@@ -1,56 +1,139 @@
-import React, { useMemo, useState } from 'react';
-import { View, StyleSheet } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { Searchbar } from 'react-native-paper';
-import { AddNoteForm } from '../../../components/AddNoteForm';
-import { NoteList } from '../../../components/NoteList';
-import { useNotesStore } from '../../../store/useNoteStore';
+import React, { useState, useEffect } from 'react';
+import { View, StyleSheet, FlatList, Alert } from 'react-native';
+import { Searchbar, Card, Text, IconButton, Chip } from 'react-native-paper';
+import { collection, query, onSnapshot, doc, deleteDoc } from 'firebase/firestore';
+import { db } from '../../../lib/firebaseConfig';
 import { useTheme } from '../../../constants/theme';
 
+interface Idea {
+  id: string;
+  titulo: string;
+  descripcion: string;
+  etiquetas: string[];
+}
+
 export default function IdeasScreen() {
-  const { colors, spacing } = useTheme();
+  const { colors } = useTheme();
   const [searchQuery, setSearchQuery] = useState('');
-  
-  const allNotes = useNotesStore((state) => state.notes);
+  const [ideas, setIdeas] = useState<Idea[]>([]);
+  const [filteredIdeas, setFilteredIdeas] = useState<Idea[]>([]);
 
-  const filteredIdeas = useMemo(() => {
-    return allNotes.filter(n => 
-      n.type === 'idea' && 
-      n.title.toLowerCase().includes(searchQuery.toLowerCase())
+  // Escuchar ideas en tiempo real desde Firestore
+  useEffect(() => {
+    const q = query(collection(db, 'ideas'));
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+      const ideasData: Idea[] = [];
+      querySnapshot.forEach((doc) => {
+        const data = doc.data();
+        ideasData.push({
+          id: doc.id,
+          titulo: data.titulo || '',
+          descripcion: data.descripcion || '',
+          etiquetas: data.etiquetas || [],
+        });
+      });
+      setIdeas(ideasData);
+      setFilteredIdeas(ideasData);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  // Filtrado por título, descripción O etiquetas
+  useEffect(() => {
+    const queryLower = searchQuery.toLowerCase();
+    const filtered = ideas.filter((idea) => {
+      const coincideTitulo = idea.titulo.toLowerCase().includes(queryLower);
+      const coincideDesc = idea.descripcion.toLowerCase().includes(queryLower);
+      const coincideEtiqueta = idea.etiquetas.some(tag => tag.toLowerCase().includes(queryLower));
+      
+      return coincideTitulo || coincideDesc || coincideEtiqueta;
+    });
+    setFilteredIdeas(filtered);
+  }, [searchQuery, ideas]);
+
+  // Función para borrar una idea de Firestore
+  const handleDelete = (id: string) => {
+    Alert.alert(
+      'Borrar Idea',
+      '¿Seguro que quieres eliminar esta idea permanentemente?',
+      [
+        { text: 'Cancelar', style: 'cancel' },
+        { 
+          text: 'Eliminar', 
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await deleteDoc(doc(db, 'ideas', id));
+            } catch (error) {
+              Alert.alert('Error', 'No se pudo borrar la idea.');
+            }
+          }
+        }
+      ]
     );
-  }, [allNotes, searchQuery]);
-
-  const bgStyle = (colors as any).background || colors.surface || '#121212';
+  };
 
   return (
-    <SafeAreaView style={[styles.safeArea, { backgroundColor: bgStyle }]} edges={['top', 'left', 'right']}>
-      <View style={[styles.container, { paddingHorizontal: spacing.md }]}>
-        
-        <Searchbar
-          placeholder="Buscar ideas..."
-          onChangeText={setSearchQuery}
-          value={searchQuery}
-          style={[styles.searchBar, { backgroundColor: colors.surface }]}
-          iconColor={colors.secondaryText}
-        />
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
+      <Searchbar
+        placeholder="Buscar por título o etiqueta..."
+        onChangeText={setSearchQuery}
+        value={searchQuery}
+        style={styles.searchbar}
+      />
 
-        <View style={styles.formContainer}>
-          <AddNoteForm type="idea" />
-        </View>
+      <FlatList
+        data={filteredIdeas}
+        keyExtractor={(item) => item.id}
+        contentContainerStyle={styles.list}
+        renderItem={({ item }) => (
+          <Card style={[styles.card, { backgroundColor: colors.surface }]} mode="elevated">
+            <Card.Content>
+              <View style={styles.headerCard}>
+                <Text variant="titleMedium" style={{ color: colors.text, flex: 1, fontWeight: 'bold' }}>
+                  {item.titulo}
+                </Text>
+                <IconButton
+                  icon="delete-outline"
+                  iconColor={colors.error || '#ff4444'}
+                  size={20}
+                  onPress={() => handleDelete(item.id)}
+                  style={styles.deleteButton}
+                />
+              </View>
+              
+              <Text variant="bodyMedium" style={{ color: colors.text, marginBottom: 12 }}>
+                {item.descripcion}
+              </Text>
 
-        <View style={styles.listContainer}>
-          <NoteList data={filteredIdeas} />
-        </View>
-
-      </View>
-    </SafeAreaView>
+              {/* Contenedor de etiquetas con colores legibles del tema */}
+              <View style={styles.tagContainer}>
+                {item.etiquetas.map((tag, index) => (
+                  <Chip 
+                    key={index} 
+                    style={[styles.chip, { backgroundColor: colors.primary }]}
+                    textStyle={{ color: colors.surface, fontSize: 12, fontWeight: '600' }}
+                  >
+                    #{tag}
+                  </Chip>
+                ))}
+              </View>
+            </Card.Content>
+          </Card>
+        )}
+      />
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  safeArea: { flex: 1 },
-  container: { flex: 1, paddingTop: 10 },
-  searchBar: { marginBottom: 16, borderRadius: 8, height: 48 },
-  formContainer: { marginBottom: 16 },
-  listContainer: { flex: 1 }
+  container: { flex: 1, paddingHorizontal: 16, paddingTop: 8 },
+  searchbar: { marginBottom: 16, borderRadius: 12 },
+  list: { paddingBottom: 100 },
+  card: { marginBottom: 12, borderRadius: 12 },
+  headerCard: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  deleteButton: { margin: 0, padding: 0 },
+  tagContainer: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
+  chip: { borderRadius: 8, height: 28, justifyContent: 'center' }
 });

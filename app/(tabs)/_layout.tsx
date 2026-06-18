@@ -75,9 +75,6 @@ export default function TabsLayout() {
       <Tabs.Screen name="notas/[id]" options={{ href: null }} />
       <Tabs.Screen name="checklists/[id]" options={{ href: null }} />
       <Tabs.Screen name="ideas/[id]" options={{ href: null }} />
-      
-      {/* Si el archivo settings.tsx está dentro de app/(tabs)/settings.tsx, se declara aquí sin pestaña */}
-      <Tabs.Screen name="settings" options={{ href: null }} />
     </Tabs>
   );
 }

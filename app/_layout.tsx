@@ -4,6 +4,9 @@ import { Stack } from 'expo-router';
 import { useTheme } from '../constants/theme';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
+// Fuerza la carga de la persistencia nativa de Firebase nada más arrancar la app
+import '../lib/firebaseConfig'; 
+
 export default function RootLayout() {
   const { colors } = useTheme();
 
