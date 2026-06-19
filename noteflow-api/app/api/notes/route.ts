@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
-import { query } from '@/lib/db';
+import { query } from '../../../lib/db'; // Corrección de ruta relativa para aislar entornos
 
 const noteSchema = z.object({
   id: z.string(),
@@ -26,7 +26,8 @@ export async function GET() {
   try {
     const dbNotes = await query<DBNoteRow>('SELECT * FROM notes ORDER BY created_at DESC');
     
-    const notes = dbNotes.map((note) => ({
+    // Corrección ESLint/TS: Tipado explícito de (note: DBNoteRow) para evitar el any implícito
+    const notes = dbNotes.map((note: DBNoteRow) => ({
       id: note.id,
       title: note.title,
       content: note.content,

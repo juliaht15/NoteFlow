@@ -28,7 +28,7 @@ export default function HomeScreen() {
       }
     });
     return unsubscribe;
-  }, []);
+  }, [router]); // Corrección ESLint: Añadido 'router' como dependencia
 
   const handleSignOut = async () => {
     try {
@@ -67,7 +67,8 @@ export default function HomeScreen() {
       Alert.alert('Éxito', 'Contraseña actualizada de forma segura.');
       setVisiblePassword(false);
       setNewPassword('');
-    } catch (error: any) {
+    } catch {
+      // Corrección ESLint: Eliminado 'error' no utilizado
       Alert.alert('Error', 'Para cambiar la contraseña debes haber iniciado sesión recientemente.');
     } finally {
       setLoading(false);
