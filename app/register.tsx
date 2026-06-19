@@ -1,5 +1,13 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, Alert } from 'react-native';
+import { 
+  StyleSheet, 
+  Alert, 
+  KeyboardAvoidingView, 
+  ScrollView, 
+  Platform, 
+  TouchableWithoutFeedback, 
+  Keyboard 
+} from 'react-native';
 import { TextInput, Button, Text } from 'react-native-paper';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../lib/firebaseConfig';
@@ -14,6 +22,7 @@ export default function RegisterScreen() {
   const [password, setPassword] = useState('');
   const [imageUri, setImageUri] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  
   const { colors } = useTheme();
   const router = useRouter();
 
@@ -47,47 +56,79 @@ export default function RegisterScreen() {
   const backgroundColorStyle = colors.background || colors.surface || '#121212';
 
   return (
-    <View style={[styles.container, { backgroundColor: backgroundColorStyle }]}>
-      <Text variant="headlineMedium" style={[styles.title, { color: colors.text }]}>
-        Crear Cuenta
-      </Text>
-      
-      <ProfileImagePicker onImageSelected={setImageUri} />
+    <KeyboardAvoidingView
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      style={[styles.container, { backgroundColor: backgroundColorStyle }]}
+    >
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <ScrollView contentContainerStyle={styles.scrollContainer}>
+          <Text variant="headlineMedium" style={[styles.title, { color: colors.text }]}>
+            Crear Cuenta
+          </Text>
+          
+          <ProfileImagePicker onImageSelected={setImageUri} />
 
-      <TextInput
-        label="Email"
-        value={email}
-        onChangeText={setEmail}
-        mode="outlined"
-        autoCapitalize="none"
-        keyboardType="email-address"
-        style={styles.input}
-      />
-      <TextInput
-        label="Contraseña"
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry
-        mode="outlined"
-        style={styles.input}
-      />
-      <Button
-        mode="contained"
-        onPress={handleRegister}
-        loading={loading}
-        disabled={loading}
-        buttonColor={colors.primary}
-        style={styles.button}
-      >
-        Registrarse
-      </Button>
-    </View>
+          <TextInput
+            label="Email"
+            value={email}
+            onChangeText={setEmail}
+            mode="outlined"
+            autoCapitalize="none"
+            keyboardType="email-address"
+            textColor={colors.text}
+            theme={{ colors: { primary: colors.primary } }}
+            style={styles.input}
+          />
+          
+          <TextInput
+            label="Contraseña"
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry
+            mode="outlined"
+            textColor={colors.text}
+            theme={{ colors: { primary: colors.primary } }}
+            style={styles.input}
+          />
+          
+          <Button
+            mode="contained"
+            onPress={handleRegister}
+            loading={loading}
+            disabled={loading}
+            buttonColor={colors.primary}
+            style={styles.button}
+          >
+            Registrarse
+          </Button>
+        </ScrollView>
+      </TouchableWithoutFeedback>
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, justifyContent: 'center', padding: 20 },
-  title: { textAlign: 'center', marginBottom: 24, fontWeight: '700' },
-  input: { marginBottom: 14, height: 50 },
-  button: { marginTop: 10, paddingVertical: 4, borderRadius: 8 },
+  container: { 
+    flex: 1,
+  },
+  scrollContainer: {
+    flexGrow: 1,
+    justifyContent: 'center',
+    padding: 20,
+    paddingBottom: 40,
+  },
+  title: { 
+    textAlign: 'center', 
+    marginBottom: 24, 
+    fontWeight: '700' 
+  },
+  input: { 
+    marginBottom: 14, 
+    height: 50 
+  },
+  button: { 
+    marginTop: 10, 
+    paddingVertical: 4, 
+    borderRadius: 8 
+  },
 });

@@ -1,8 +1,12 @@
+import { Platform } from 'react-native';
 import { AnyNote } from '../types/index';
 
 export type NoteInput = Omit<AnyNote, 'id' | 'createdAt' | 'updatedAt'>;
 
-const API_URL = 'http://localhost:3000/api'; 
+// En emuladores de Android, localhost es la IP 10.0.2.2. Cambia esto por tu IP local si testeas en dispositivo físico.
+const API_URL = Platform.OS === 'android' 
+  ? 'http://10.0.2.2:3000/api' 
+  : 'http://localhost:3000/api'; 
 
 export const api = {
   getNotes: async (): Promise<AnyNote[]> => {

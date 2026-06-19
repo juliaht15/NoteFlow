@@ -32,6 +32,7 @@ export default function ChecklistsScreen() {
           value={searchQuery}
           style={[styles.searchBar, { backgroundColor: colors.surface }]}
           iconColor={colors.secondaryText}
+          theme={{ colors: { primary: colors.primary } }}
         />
 
         <View style={styles.formContainer}>
@@ -50,7 +51,7 @@ export default function ChecklistsScreen() {
 const styles = StyleSheet.create({
   safeArea: { flex: 1 },
   container: { flex: 1, paddingTop: 10 },
-  searchBar: { marginBottom: 16, borderRadius: 8, height: 48 },
+  searchBar: { marginBottom: 16, borderRadius: 12, height: 48 },
   formContainer: { marginBottom: 16 },
-  listContainer: { flex: 1 }
+  listContainer: { flex: 1, paddingBottom: 110 }
 });

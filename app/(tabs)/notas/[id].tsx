@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, ScrollView } from 'react-native';
+import { View, StyleSheet, ScrollView, KeyboardAvoidingView, Platform, TouchableWithoutFeedback, Keyboard } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { TextInput, Button, IconButton, Text } from 'react-native-paper';
@@ -55,79 +55,96 @@ export default function NoteDetailScreen() {
   };
 
   const bgStyle = (colors as any).background || colors.surface || '#121212';
-  const errorColor = colors.danger || '#ff1744';
+  const errorColor = colors.error || colors.danger || '#ff1744';
   const disabledColor = (colors as any).disabled || colors.secondaryText || '#777777';
 
   return (
-    <SafeAreaView style={[styles.safeArea, { backgroundColor: bgStyle }]} edges={['top', 'left', 'right']}>
-      <ScrollView contentContainerStyle={[styles.container, { padding: spacing.md }]}>
-        
-        <View style={styles.headerActions}>
-          <IconButton
-            icon={isEditing ? "close" : "pencil"}
-            iconColor={colors.text}
-            size={24}
-            onPress={() => setIsEditing(!isEditing)}
-          />
-          <IconButton
-            icon="delete"
-            iconColor={errorColor}
-            size={24}
-            onPress={handleDelete}
-          />
-        </View>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      style={[styles.safeArea, { backgroundColor: bgStyle }]}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
+    >
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
+          <ScrollView contentContainerStyle={[styles.container, { padding: spacing.md }]}>
+            
+            <View style={styles.headerActions}>
+              <IconButton
+                icon={isEditing ? "close" : "pencil"}
+                iconColor={colors.text}
+                size={24}
+                onPress={() => setIsEditing(!isEditing)}
+              />
+              <IconButton
+                icon="delete"
+                iconColor={errorColor}
+                size={24}
+                onPress={handleDelete}
+              />
+            </View>
 
-        {isEditing ? (
-          <View style={styles.form}>
-            <TextInput
-              label="Título de la nota"
-              value={title}
-              onChangeText={setTitle}
-              mode="outlined"
-              style={styles.input}
-            />
-            <TextInput
-              label="Contenido"
-              value={content}
-              onChangeText={setContent}
-              mode="outlined"
-              multiline
-              numberOfLines={6}
-              style={styles.input}
-            />
-            <Button mode="contained" onPress={handleSaveChanges} style={styles.saveButton}>
-              Guardar Cambios
-            </Button>
-          </View>
-        ) : (
-          <View style={styles.displayContainer}>
-            <Text variant="headlineMedium" style={[styles.title, { color: colors.text }]}>
-              {currentNote.title}
-            </Text>
-            {currentNote.content ? (
-              <Text variant="bodyLarge" style={[styles.content, { color: colors.secondaryText }]}>
-                {currentNote.content}
-              </Text>
-            ) : null}
-            <Text variant="bodySmall" style={{ color: disabledColor, marginTop: 24 }}>
-              Actualizada: {new Date(currentNote.updatedAt).toLocaleDateString()}
-            </Text>
-          </View>
-        )}
+            {isEditing ? (
+              <View style={styles.form}>
+                <TextInput
+                  label="Título de la nota"
+                  value={title}
+                  onChangeText={setTitle}
+                  mode="outlined"
+                  textColor={colors.text}
+                  theme={{ colors: { primary: colors.primary } }}
+                  style={styles.input}
+                />
+                <TextInput
+                  label="Contenido"
+                  value={content}
+                  onChangeText={setContent}
+                  mode="outlined"
+                  multiline
+                  numberOfLines={8}
+                  textColor={colors.text}
+                  theme={{ colors: { primary: colors.primary } }}
+                  style={styles.input}
+                />
+                <Button 
+                  mode="contained" 
+                  onPress={handleSaveChanges} 
+                  buttonColor={colors.primary}
+                  style={styles.saveButton}
+                >
+                  Guardar Cambios
+                </Button>
+              </View>
+            ) : (
+              <View style={styles.displayContainer}>
+                <Text variant="headlineMedium" style={[styles.title, { color: colors.text }]}>
+                  {currentNote.title}
+                </Text>
+                {currentNote.content ? (
+                  <Text variant="bodyLarge" style={[styles.content, { color: colors.secondaryText }]}>
+                    {currentNote.content}
+                  </Text>
+                ) : null}
+                <Text variant="bodySmall" style={{ color: disabledColor, marginTop: 24 }}>
+                  Actualizada: {new Date(currentNote.updatedAt).toLocaleDateString()}
+                </Text>
+              </View>
+            )}
 
-      </ScrollView>
-    </SafeAreaView>
+          </ScrollView>
+        </SafeAreaView>
+      </TouchableWithoutFeedback>
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
   safeArea: { flex: 1 },
-  container: { flexGrow: 1 },
+  container: { flexGrow: 1, paddingBottom: 40 },
   center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   headerActions: { flexDirection: 'row', justifyContent: 'flex-end', marginBottom: 16 },
   form: { width: '100%' },
   input: { marginBottom: 16 },
-  saveButton: { marginTop: 8 },
+  saveButton: { marginTop: 8, paddingVertical: 2 },
   displayContainer: { paddingHorizontal: 4 },
   title: { fontWeight: '700', marginBottom: 16 },
   content: { lineHeight: 24 }

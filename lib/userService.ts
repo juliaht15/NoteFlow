@@ -8,7 +8,7 @@ export const createUserProfile = async (uid: string, email: string, photoUrl: st
       createdAt: new Date().toISOString(),
       avatarUrl: photoUrl,
       bio: ""
-    });
+    }, { merge: true }); // Evita machacar campos existentes en actualizaciones
   } catch (error) {
     console.error("Error al crear perfil:", error);
     throw error;

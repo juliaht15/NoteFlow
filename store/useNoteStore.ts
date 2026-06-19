@@ -10,6 +10,7 @@ export interface NoteState {
   folders: Folder[];
   addNote: (note: Omit<AnyNote, 'id' | 'createdAt' | 'updatedAt'>) => void;
   removeNote: (id: string) => void;
+  deleteNote: (id: string) => void; // Alias para evitar colisiones entre pantallas
   updateNote: (id: string, updatedData: Partial<AnyNote>) => void;
   createFolder: (name: string) => void;
   removeFolder: (id: string) => void;
@@ -30,6 +31,10 @@ export const useNotesStore = create<NoteState>()(
         return { notes: [...state.notes, fullNote] };
       }),
       removeNote: (id) => set((state) => ({ 
+        notes: state.notes.filter((n) => n.id !== id) 
+      })),
+      // Mismo comportamiento unificado bajo la acción deleteNote
+      deleteNote: (id) => set((state) => ({ 
         notes: state.notes.filter((n) => n.id !== id) 
       })),
       updateNote: (id, updatedData) => set((state) => ({

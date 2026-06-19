@@ -1,30 +1,36 @@
-export interface BaseNote {
+export type NoteType = 'note' | 'idea' | 'checklist';
+
+export interface BaseItem {
   id: string;
+  type: NoteType;
   title: string;
+  content: string;
+  folderId?: string | null;
   createdAt: string;
   updatedAt: string;
-  location?: { lat: number; lng: number } | null;
-  folderId?: string | null;
 }
 
-export interface TextNote extends BaseNote {
+export interface Note extends BaseItem {
   type: 'note';
-  content: string;
 }
 
-export interface ChecklistNote extends BaseNote {
-  type: 'checklist';
-  content: string;
-  items: { id: string; text: string; checked: boolean }[];
-}
-
-export interface IdeaNote extends BaseNote {
+export interface Idea extends BaseItem {
   type: 'idea';
-  content: string;
   tags: string[];
 }
 
-export type AnyNote = TextNote | ChecklistNote | IdeaNote;
+export interface ChecklistItem {
+  id: string;
+  text: string;
+  checked: boolean;
+}
+
+export interface Checklist extends BaseItem {
+  type: 'checklist';
+  items: ChecklistItem[];
+}
+
+export type AnyNote = Note | Idea | Checklist;
 
 export interface Folder {
   id: string;

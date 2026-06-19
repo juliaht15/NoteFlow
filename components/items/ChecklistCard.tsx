@@ -1,14 +1,14 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { ChecklistNote } from '@/types';
+import { Checklist } from '@/types';
 import { useTheme } from '@/constants/theme';
 
-export const ChecklistCard = ({ note }: { note: ChecklistNote }) => {
+export const ChecklistCard = ({ note }: { note: Checklist }) => {
   const { colors } = useTheme();
   
   const checklistItems = note.items || [];
   const completed = checklistItems.filter(i => i && i.checked).length;
-  const progress = checklistItems.length > 0 ? (completed / checklistItems.length) * 100 : 0;
+  const progress = checklistItems.length > 0 ? Math.min((completed / checklistItems.length) * 100, 100) : 0;
 
   return (
     <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}>
@@ -16,7 +16,7 @@ export const ChecklistCard = ({ note }: { note: ChecklistNote }) => {
       <Text style={[styles.info, { color: colors.secondaryText }]}>
         {completed}/{checklistItems.length} completados
       </Text>
-      <View style={[styles.progressBar, { backgroundColor: colors.border }]}>
+      <View style={[styles.progressBar, { backgroundColor: colors.surfaceVariant || colors.border }]}>
         <View style={[styles.progress, { width: `${progress}%`, backgroundColor: colors.primary }]} />
       </View>
     </View>
@@ -24,9 +24,9 @@ export const ChecklistCard = ({ note }: { note: ChecklistNote }) => {
 };
 
 const styles = StyleSheet.create({
-  card: { padding: 16, borderRadius: 8, borderWidth: 1 },
+  card: { padding: 16, borderRadius: 16, borderWidth: 1 },
   title: { fontSize: 16, fontWeight: '700', marginBottom: 4 },
-  info: { fontSize: 13, marginBottom: 8 },
+  info: { fontSize: 13, marginBottom: 10 },
   progressBar: { height: 6, borderRadius: 3, overflow: 'hidden' },
   progress: { height: 6 }
 });

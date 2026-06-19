@@ -1,27 +1,22 @@
 import React from 'react';
-import { TouchableOpacity, StyleSheet } from 'react-native';
-import { useRouter } from 'expo-router';
+import { StyleSheet } from 'react-native';
 import { AnyNote } from '@/types';
 import { ChecklistCard } from './items/ChecklistCard';
 import { IdeaCard } from './items/IdeaCard';
 import { NoteItem } from './items/NoteItem';
+import { TouchableOpacity } from 'react-native-gesture-handler';
 
-export const NoteCard = ({ note }: { note: AnyNote }) => {
-  const router = useRouter();
+interface NoteCardProps {
+  note: AnyNote;
+  onPress?: () => void;
+}
 
-  const getRoutePath = (type: string) => {
-    switch (type) {
-      case 'note': return 'notas';
-      case 'checklist': return 'checklists';
-      case 'idea': return 'ideas';
-      default: return 'notas';
-    }
-  };
-
+export const NoteCard = ({ note, onPress }: NoteCardProps) => {
   return (
     <TouchableOpacity 
-      onPress={() => router.push(`/(tabs)/${getRoutePath(note.type)}/${note.id}` as any)}
+      onPress={onPress} 
       style={styles.wrapper}
+      activeOpacity={0.7}
     >
       {note.type === 'note' && <NoteItem note={note} />}
       {note.type === 'checklist' && <ChecklistCard note={note} />}
@@ -31,5 +26,8 @@ export const NoteCard = ({ note }: { note: AnyNote }) => {
 };
 
 const styles = StyleSheet.create({
-  wrapper: { marginHorizontal: 16, marginVertical: 5 }
+  wrapper: { 
+    marginHorizontal: 16, 
+    marginVertical: 5,
+  }
 });

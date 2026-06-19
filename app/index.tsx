@@ -1,5 +1,13 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, Alert } from 'react-native';
+import { 
+  StyleSheet, 
+  Alert, 
+  KeyboardAvoidingView, 
+  ScrollView, 
+  Platform, 
+  TouchableWithoutFeedback, 
+  Keyboard 
+} from 'react-native';
 import { TextInput, Button, Text } from 'react-native-paper';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../lib/firebaseConfig';
@@ -24,8 +32,8 @@ export default function LoginScreen() {
 
     try {
       await signInWithEmailAndPassword(auth, email, password);
-
-      router.replace('/notas');
+      // Redirige al contenedor de las pestañas principales corregidas
+      router.replace('/(tabs)');
     } catch (error: any) {
       Alert.alert('Error de acceso', error.message);
     } finally {
@@ -34,63 +42,73 @@ export default function LoginScreen() {
   };
 
   return (
-    <View
-      style={[
-        styles.container,
-        { backgroundColor: colors.background },
-      ]}
+    <KeyboardAvoidingView
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      style={[styles.container, { backgroundColor: colors.background }]}
     >
-      <Text
-        variant="headlineMedium"
-        style={[
-          styles.title,
-          { color: colors.text },
-        ]}
-      >
-        NoteFlow
-      </Text>
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <ScrollView contentContainerStyle={styles.scrollContainer}>
+          <Text
+            variant="headlineMedium"
+            style={[styles.title, { color: colors.text }]}
+          >
+            NoteFlow
+          </Text>
 
-      <TextInput
-        label="Email"
-        value={email}
-        onChangeText={setEmail}
-        mode="outlined"
-        autoCapitalize="none"
-        style={styles.input}
-      />
+          <TextInput
+            label="Email"
+            value={email}
+            onChangeText={setEmail}
+            mode="outlined"
+            autoCapitalize="none"
+            keyboardType="email-address"
+            textColor={colors.text}
+            theme={{ colors: { primary: colors.primary } }}
+            style={styles.input}
+          />
 
-      <TextInput
-        label="Contraseña"
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry
-        mode="outlined"
-        style={styles.input}
-      />
+          <TextInput
+            label="Contraseña"
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry
+            mode="outlined"
+            textColor={colors.text}
+            theme={{ colors: { primary: colors.primary } }}
+            style={styles.input}
+          />
 
-      <Button
-        mode="contained"
-        onPress={handleLogin}
-        loading={loading}
-        style={styles.button}
-      >
-        Iniciar Sesión
-      </Button>
+          <Button
+            mode="contained"
+            onPress={handleLogin}
+            loading={loading}
+            disabled={loading}
+            buttonColor={colors.primary}
+            style={styles.button}
+          >
+            Iniciar Sesión
+          </Button>
 
-      <Button
-        mode="text"
-        onPress={() => router.push('/register')}
-        style={styles.link}
-      >
-        ¿No tienes cuenta? Regístrate
-      </Button>
-    </View>
+          <Button
+            mode="text"
+            onPress={() => router.push('/register')}
+            textColor={colors.primary}
+            style={styles.link}
+          >
+            ¿No tienes cuenta? Regístrate
+          </Button>
+        </ScrollView>
+      </TouchableWithoutFeedback>
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  scrollContainer: {
+    flexGrow: 1,
     justifyContent: 'center',
     padding: 24,
   },

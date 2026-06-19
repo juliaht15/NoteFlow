@@ -23,12 +23,10 @@ export const AddNoteForm = ({ type }: AddNoteFormProps) => {
       type,
     };
 
-    // Tanto notas, checklists como ideas ahora pueden llevar descripción/contenido base
     if (type === 'note' || type === 'idea' || type === 'checklist') {
       noteData.content = content.trim();
     }
 
-    // Si es checklist, además inicializamos una estructura de items interactivos limpios
     if (type === 'checklist') {
       noteData.items = content.trim() 
         ? content.split('\n').map((line, idx) => ({ id: String(idx), text: line.trim(), checked: false }))
@@ -47,12 +45,14 @@ export const AddNoteForm = ({ type }: AddNoteFormProps) => {
   };
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.surface }]}>
+    <View style={[styles.container, { backgroundColor: colors.surface, borderColor: colors.border, borderWidth: 1 }]}>
       <TextInput
         label="Título"
         value={title}
         onChangeText={setTitle}
         mode="outlined"
+        textColor={colors.text}
+        theme={{ colors: { primary: colors.primary } }}
         style={styles.input}
       />
       
@@ -63,6 +63,8 @@ export const AddNoteForm = ({ type }: AddNoteFormProps) => {
         mode="outlined"
         multiline
         numberOfLines={3}
+        textColor={colors.text}
+        theme={{ colors: { primary: colors.primary } }}
         style={styles.input}
       />
 
@@ -73,11 +75,18 @@ export const AddNoteForm = ({ type }: AddNoteFormProps) => {
           onChangeText={setTags}
           mode="outlined"
           placeholder="ej: diseño, backend, bug"
+          textColor={colors.text}
+          theme={{ colors: { primary: colors.primary } }}
           style={styles.input}
         />
       )}
 
-      <Button mode="contained" onPress={handleSave} style={styles.button}>
+      <Button 
+        mode="contained" 
+        onPress={handleSave} 
+        buttonColor={colors.primary}
+        style={styles.button}
+      >
         Guardar {type === 'note' ? 'Nota' : type === 'checklist' ? 'Lista' : 'Idea'}
       </Button>
     </View>
@@ -85,7 +94,7 @@ export const AddNoteForm = ({ type }: AddNoteFormProps) => {
 };
 
 const styles = StyleSheet.create({
-  container: { padding: 16, borderRadius: 8, marginBottom: 16 },
+  container: { padding: 16, borderRadius: 16, marginBottom: 16 },
   input: { marginBottom: 12 },
-  button: { marginTop: 4 }
+  button: { marginTop: 4, paddingVertical: 2 }
 });

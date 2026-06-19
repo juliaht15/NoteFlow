@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, ScrollView } from 'react-native';
+import { View, StyleSheet, ScrollView, KeyboardAvoidingView, Platform, TouchableWithoutFeedback, Keyboard } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { TextInput, Button, IconButton, Text } from 'react-native-paper';
@@ -13,7 +13,7 @@ export default function ChecklistDetailScreen() {
   
   const notes = useNotesStore((state) => state.notes);
   const updateNote = useNotesStore((state) => state.updateNote);
-  const removeNote = useNotesStore((state) => state.removeNote);
+  const deleteNote = useNotesStore((state) => (state as any).deleteNote);
 
   const currentChecklist = notes.find((n) => n.id === id);
 
@@ -43,7 +43,9 @@ export default function ChecklistDetailScreen() {
       item.id === itemId ? { ...item, checked: !item.checked } : item
     );
     setChecklistItems(updatedItems);
-    updateNote(currentChecklist.id, { items: updatedItems });
+    if (updateNote) {
+      updateNote(currentChecklist.id, { items: updatedItems });
+    }
   };
 
   const handleSaveChanges = () => {
@@ -57,87 +59,129 @@ export default function ChecklistDetailScreen() {
       };
     });
 
-    updateNote(currentChecklist.id, {
-      title: title.trim(),
-      content: content.trim(),
-      items: updatedItems,
-    });
+    if (updateNote) {
+      updateNote(currentChecklist.id, {
+        title: title.trim(),
+        content: content.trim(),
+        items: updatedItems,
+        updatedAt: new Date().toISOString(),
+      });
+    }
     setIsEditing(false);
   };
 
   const handleDelete = () => {
-    removeNote(currentChecklist.id);
-    router.back();
+    if (deleteNote) {
+      deleteNote(currentChecklist.id);
+      router.back();
+    }
   };
 
-  const errorColor = colors.danger || '#ff3b30';
+  const bgStyle = colors.background || colors.surface || '#121212';
+  const errorColor = colors.error || colors.danger || '#ff3b30';
 
   return (
-    <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background || colors.surface }]} edges={['top', 'left', 'right']}>
-      <ScrollView contentContainerStyle={[styles.container, { padding: spacing.md }]}>
-        
-        <View style={styles.headerActions}>
-          <IconButton
-            icon={isEditing ? "close" : "pencil"}
-            iconColor={colors.text}
-            size={24}
-            onPress={() => setIsEditing(!isEditing)}
-          />
-          <IconButton
-            icon="delete"
-            iconColor={errorColor}
-            size={24}
-            onPress={handleDelete}
-          />
-        </View>
-
-        {isEditing ? (
-          <View style={styles.form}>
-            <TextInput label="Título de la lista" value={title} onChangeText={setTitle} mode="outlined" style={styles.input} />
-            <TextInput label="Elementos (uno por línea)" value={content} onChangeText={setContent} mode="outlined" multiline numberOfLines={6} style={styles.input} />
-            <Button mode="contained" onPress={handleSaveChanges} style={styles.saveButton}>
-              Guardar Cambios
-            </Button>
-          </View>
-        ) : (
-          <View style={styles.displayContainer}>
-            <Text variant="headlineMedium" style={[styles.title, { color: colors.text }]}>{currentChecklist.title}</Text>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      style={[styles.safeArea, { backgroundColor: bgStyle }]}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
+    >
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
+          <ScrollView contentContainerStyle={[styles.container, { padding: spacing.md }]}>
             
-            <View style={styles.checklistBlock}>
-              {checklistItems.map((item) => (
-                <View key={item.id} style={styles.checkRow}>
-                  <IconButton
-                    icon={item.checked ? "checkbox-marked-circle" : "checkbox-blank-circle-outline"}
-                    iconColor={item.checked ? colors.primary : colors.secondaryText}
-                    size={24}
-                    onPress={() => toggleCheckItem(item.id)}
-                    style={styles.checkButton}
-                  />
-                  <Text style={[styles.checkText, { color: colors.text, textDecorationLine: item.checked ? 'line-through' : 'none' }]}>
-                    {item.text}
-                  </Text>
-                </View>
-              ))}
+            <View style={styles.headerActions}>
+              <IconButton
+                icon={isEditing ? "close" : "pencil"}
+                iconColor={colors.text}
+                size={24}
+                onPress={() => setIsEditing(!isEditing)}
+              />
+              <IconButton
+                icon="delete"
+                iconColor={errorColor}
+                size={24}
+                onPress={handleDelete}
+              />
             </View>
-          </View>
-        )}
-      </ScrollView>
-    </SafeAreaView>
+
+            {isEditing ? (
+              <View style={styles.form}>
+                <TextInput 
+                  label="Título de la lista" 
+                  value={title} 
+                  onChangeText={setTitle} 
+                  mode="outlined" 
+                  textColor={colors.text}
+                  theme={{ colors: { primary: colors.primary } }}
+                  style={styles.input} 
+                />
+                <TextInput 
+                  label="Elementos (uno por línea)" 
+                  value={content} 
+                  onChangeText={setContent} 
+                  mode="outlined" 
+                  multiline 
+                  numberOfLines={8} 
+                  textColor={colors.text}
+                  theme={{ colors: { primary: colors.primary } }}
+                  style={styles.input} 
+                />
+                <Button 
+                  mode="contained" 
+                  onPress={handleSaveChanges} 
+                  buttonColor={colors.primary}
+                  style={styles.saveButton}
+                >
+                  Guardar Cambios
+                </Button>
+              </View>
+            ) : (
+              <View style={styles.displayContainer}>
+                <Text variant="headlineMedium" style={[styles.title, { color: colors.text }]}>
+                  {currentChecklist.title}
+                </Text>
+                
+                <View style={styles.checklistBlock}>
+                  {checklistItems.map((item) => (
+                    <View key={item.id} style={styles.checkRow}>
+                      <IconButton
+                        icon={item.checked ? "checkbox-marked-circle" : "checkbox-blank-circle-outline"}
+                        iconColor={item.checked ? colors.primary : colors.secondaryText}
+                        size={24}
+                        onPress={() => toggleCheckItem(item.id)}
+                        style={styles.checkButton}
+                      />
+                      <Text style={[styles.checkText, { 
+                        color: item.checked ? colors.secondaryText : colors.text, 
+                        textDecorationLine: item.checked ? 'line-through' : 'none' 
+                      }]}>
+                        {item.text}
+                      </Text>
+                    </View>
+                  ))}
+                </View>
+              </View>
+            )}
+          </ScrollView>
+        </SafeAreaView>
+      </TouchableWithoutFeedback>
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
   safeArea: { flex: 1 },
-  container: { flexGrow: 1, paddingBottom: 100 },
+  container: { flexGrow: 1, paddingBottom: 40 },
   center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   headerActions: { flexDirection: 'row', justifyContent: 'flex-end', marginBottom: 16 },
   form: { width: '100%' },
   input: { marginBottom: 16 },
-  saveButton: { marginTop: 8 },
+  saveButton: { marginTop: 8, paddingVertical: 2 },
   displayContainer: { paddingHorizontal: 4 },
   title: { fontWeight: '700', marginBottom: 16 },
   checklistBlock: { marginTop: 8 },
-  checkRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 4 },
+  checkRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 8 },
   checkButton: { margin: 0, padding: 0 },
-  checkText: { fontSize: 16, marginLeft: 4, flex: 1 }
+  checkText: { fontSize: 16, marginLeft: 8, flex: 1 }
 });

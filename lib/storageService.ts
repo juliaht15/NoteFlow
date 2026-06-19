@@ -1,4 +1,3 @@
-// E:\Proyectos\noteflow\lib\storageService.ts
 import { storage } from './firebaseConfig';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
