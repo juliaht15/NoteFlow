@@ -10,6 +10,7 @@ export default function LoginScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+
   const { colors } = useTheme();
   const router = useRouter();
 
@@ -18,10 +19,13 @@ export default function LoginScreen() {
       Alert.alert('Error', 'Introduce tus credenciales.');
       return;
     }
+
     setLoading(true);
+
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      router.replace('/(tabs)/notas');
+
+      router.replace('/notas');
     } catch (error: any) {
       Alert.alert('Error de acceso', error.message);
     } finally {
@@ -30,10 +34,22 @@ export default function LoginScreen() {
   };
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <Text variant="headlineMedium" style={[styles.title, { color: colors.text }]}>
+    <View
+      style={[
+        styles.container,
+        { backgroundColor: colors.background },
+      ]}
+    >
+      <Text
+        variant="headlineMedium"
+        style={[
+          styles.title,
+          { color: colors.text },
+        ]}
+      >
         NoteFlow
       </Text>
+
       <TextInput
         label="Email"
         value={email}
@@ -42,6 +58,7 @@ export default function LoginScreen() {
         autoCapitalize="none"
         style={styles.input}
       />
+
       <TextInput
         label="Contraseña"
         value={password}
@@ -50,10 +67,21 @@ export default function LoginScreen() {
         mode="outlined"
         style={styles.input}
       />
-      <Button mode="contained" onPress={handleLogin} loading={loading} style={styles.button}>
+
+      <Button
+        mode="contained"
+        onPress={handleLogin}
+        loading={loading}
+        style={styles.button}
+      >
         Iniciar Sesión
       </Button>
-      <Button mode="text" onPress={() => router.push('/register')} style={styles.link}>
+
+      <Button
+        mode="text"
+        onPress={() => router.push('/register')}
+        style={styles.link}
+      >
         ¿No tienes cuenta? Regístrate
       </Button>
     </View>
@@ -61,9 +89,24 @@ export default function LoginScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, justifyContent: 'center', padding: 24 },
-  title: { textAlign: 'center', marginBottom: 32, fontWeight: '700' },
-  input: { marginBottom: 16 },
-  button: { marginTop: 8, paddingVertical: 4 },
-  link: { marginTop: 16 }
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    padding: 24,
+  },
+  title: {
+    textAlign: 'center',
+    marginBottom: 32,
+    fontWeight: '700',
+  },
+  input: {
+    marginBottom: 16,
+  },
+  button: {
+    marginTop: 8,
+    paddingVertical: 4,
+  },
+  link: {
+    marginTop: 16,
+  },
 });

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Tabs } from 'expo-router';
-import { useTheme } from '../../constants/theme';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { useTheme } from '../../constants/theme';
 
 export default function TabsLayout() {
   const { colors } = useTheme();
@@ -43,38 +43,64 @@ export default function TabsLayout() {
           ),
         }}
       />
+
       <Tabs.Screen
-        name="notas/index"
+        name="notas"
         options={{
           title: 'Notas',
           tabBarIcon: ({ color, size }) => (
-            <MaterialCommunityIcons name="file-document" color={color} size={size} />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="checklists/index"
-        options={{
-          title: 'Checklist',
-          tabBarIcon: ({ color, size }) => (
-            <MaterialCommunityIcons name="checkbox-marked" color={color} size={size} />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="ideas/index"
-        options={{
-          title: 'Ideas',
-          tabBarIcon: ({ color, size }) => (
-            <MaterialCommunityIcons name="lightbulb" color={color} size={size} />
+            <MaterialCommunityIcons
+              name="file-document"
+              color={color}
+              size={size}
+            />
           ),
         }}
       />
 
-      {/* Ocultar las rutas dinámicas de la barra de pestañas */}
-      <Tabs.Screen name="notas/[id]" options={{ href: null }} />
-      <Tabs.Screen name="checklists/[id]" options={{ href: null }} />
-      <Tabs.Screen name="ideas/[id]" options={{ href: null }} />
+      <Tabs.Screen
+        name="checklist"
+        options={{
+          title: 'Checklist',
+          tabBarIcon: ({ color, size }) => (
+            <MaterialCommunityIcons
+              name="checkbox-marked"
+              color={color}
+              size={size}
+            />
+          ),
+        }}
+      />
+
+      <Tabs.Screen
+        name="ideas"
+        options={{
+          title: 'Ideas',
+          tabBarIcon: ({ color, size }) => (
+            <MaterialCommunityIcons
+              name="lightbulb"
+              color={color}
+              size={size}
+            />
+          ),
+        }}
+      />
+
+      {/* Ocultar rutas dinámicas */}
+      <Tabs.Screen
+        name="notas/[id]"
+        options={{ href: null }}
+      />
+
+      <Tabs.Screen
+        name="checklist/[id]"
+        options={{ href: null }}
+      />
+
+      <Tabs.Screen
+        name="ideas/[id]"
+        options={{ href: null }}
+      />
     </Tabs>
   );
 }
