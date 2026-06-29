@@ -11,10 +11,6 @@
 
 Aplicación móvil nativa de alto rendimiento diseñada para ofrecer una experiencia fluida con persistencia de datos local y una interfaz optimizada para dispositivos iOS y Android.
 
-## 🎥 Demo Técnica
-> **[Ver presentación técnica en Loom](URL_DE_TU_VIDEO_AQUÍ)**
-*(Video de 5 minutos explicando la arquitectura, flujos nativos y retos técnicos resueltos)*
-
 ---
 
 ## 🏗️ Arquitectura y ADRs
